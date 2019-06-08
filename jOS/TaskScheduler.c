@@ -80,7 +80,7 @@ volatile uint8_t ui8SchedulerStatus = ON_HOLD;                                  
 void vSchedulerInterrupt();                                                                           /*!< Void type function. */
 void vCheckTaskReturn(uint8_t ui8TaskReturn);                                                         /*!< Void type function. */
 
-//! Function: Task Manager Init
+//! Function: Task Manager Initializer
 /*!
   Initialize the task manager.
   \return Returns BUFFER_MANAGER_ERROR, TASK_SCHEDULED_BUFFER_ERROR or TASK_MANAGER_INITIALIZED.
