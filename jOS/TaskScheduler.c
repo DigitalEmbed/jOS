@@ -262,13 +262,13 @@ uint8_t ui8DisableTask(task_t* tpTask){
   \return Returns TASK_TIMER_RESTARTED or TASK_TIMER_NOT_RESTARTED.
 */
 uint8_t ui8RestartTimerTask(task_t* tpTask){
-	if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
-		ui16TaskArrayTimer[tpTask->ui8Priority][tpTask->ui8TaskAddress] = tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress]->ui16Period;
-		return TASK_TIMER_RESTARTED;
-	}
-	else{
-		return TASK_TIMER_NOT_RESTARTED;
-	}
+  if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
+    ui16TaskArrayTimer[tpTask->ui8Priority][tpTask->ui8TaskAddress] = tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress]->ui16Period;
+    return TASK_TIMER_RESTARTED;
+  }
+  else{
+    return TASK_TIMER_NOT_RESTARTED;
+  }
 }
 
 //! Function: Task Period Changer
@@ -406,25 +406,25 @@ void vSchedulerInterrupt(){
   If have a pending task on buffer, the task runs.
 */
 void vStartScheduler(){
-	task_t** tppBuffer = (task_t**) vpPullBufferData(bpScheduledTasks);
-	while (ui8GetAmountOfPendingData(bpScheduledTasks) > 0 && *tppBuffer != NULL && (*tppBuffer)->ui8Status == DISABLED){
-		tppBuffer = (task_t**) vpPullBufferData(bpScheduledTasks);
-	}
-	if (tppBuffer != NULL){
-		void* vpBufferArguments = faScheduledTasksArguments[ui8GetReadPosition(bpScheduledTasks)];
-		tpCurrentTask = *tppBuffer;
-		ui16SystemTimer = 0;
-		ui8SchedulerStatus = RUNNING_TASK;
-		vSystemRestartTimerInit();
-		register uint8_t ui8TaskReturn = tpCurrentTask->pfFunction(vpBufferArguments);
-		vSystemRestartTimerStop();
-		ui8SchedulerStatus = ON_HOLD;
-		ui16SystemTimer = 0;
-		vCheckTaskReturn(ui8TaskReturn);
-	}
-	else{
-		vSystemSleep();
-	}
+  task_t** tppBuffer = (task_t**) vpPullBufferData(bpScheduledTasks);
+  while (ui8GetAmountOfPendingData(bpScheduledTasks) > 0 && *tppBuffer != NULL && (*tppBuffer)->ui8Status == DISABLED){
+    tppBuffer = (task_t**) vpPullBufferData(bpScheduledTasks);
+  }
+  if (tppBuffer != NULL){
+    void* vpBufferArguments = faScheduledTasksArguments[ui8GetReadPosition(bpScheduledTasks)];
+    tpCurrentTask = *tppBuffer;
+    ui16SystemTimer = 0;
+    ui8SchedulerStatus = RUNNING_TASK;
+    vSystemRestartTimerInit();
+    register uint8_t ui8TaskReturn = tpCurrentTask->pfFunction(vpBufferArguments);
+    vSystemRestartTimerStop();
+    ui8SchedulerStatus = ON_HOLD;
+    ui16SystemTimer = 0;
+    vCheckTaskReturn(ui8TaskReturn);
+  }
+  else{
+    vSystemSleep();
+  }
 }
 
 //! Function: Check Current Task
@@ -516,4 +516,3 @@ void vCheckTaskReturn(uint8_t ui8TaskReturn){
       break;
   }
 }
-
