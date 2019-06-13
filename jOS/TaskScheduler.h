@@ -158,10 +158,6 @@ task_t* tpFindTask(const char* cpTaskName);                                     
 void* vpGetArguments(task_t* tpTask);                                                                                                                                 	/*!< void pointer type function. */
 void vStartScheduler();                                                                                                                                               	/*!< void type function. */
 
-extern volatile task_t* tpTaskArray[4][4];
-extern task_t** tppScheduledTasksVector[20];
-extern volatile uint8_t ui8LastPriority;
-
 #ifdef __cplusplus
   }
 #endif
