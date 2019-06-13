@@ -130,6 +130,7 @@ uint8_t ui8AddTask(task_t* tpTask, pfunc_t pfFunction, const char* cpTaskName, v
   tpTask->ui16Period = ui16Period;
   tpTask->ui8Status = ui8Status;
   tpTask->vpArguments = vpArguments;
+  tpTask->ui16Line = 0;
   if (tpTask->ui8Status == NOT_INSTALLED){
     return TASK_CREATED;
   }
