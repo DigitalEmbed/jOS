@@ -160,6 +160,7 @@ int main(void){
     Hardwares initialization.
   */
   vSetPinMode(13, OUTPUT);
+	vUARTInit(9600);
 
   /*!
     Memory manager initialization.
@@ -167,9 +168,11 @@ int main(void){
   if (ui8MemoryManagerInit() != MEMORY_MANAGER_INITIALIZED){
     vSystemRestart();
   }
-
+	
+	/*!
+    sTaskFlag switch declaration.
+  */
   switch_t sTaskFlag;
-  vUARTInit(9600);
 
   /*!
     Tasks installations.
