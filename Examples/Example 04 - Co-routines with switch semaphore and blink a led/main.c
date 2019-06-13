@@ -175,7 +175,7 @@ int main(void){
 	switch_t sTaskFlag;
 	
 	/*!
-		Installing tasks.
+		Tasks installations.
 	*/
 	ui8AddTask(&tTask1, &ui8Task1, "Task1", &sTaskFlag, 0, 50, ENABLED);
 	ui8AddTask(&tTask2, &ui8Task2, "Task2", &sTaskFlag, 0, 50, ENABLED);
