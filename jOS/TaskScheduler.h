@@ -119,6 +119,7 @@ typedef struct {
   uint16_t ui16Period;                          /*!< 16-bit integer type. */
   uint8_t ui8Status;                            /*!< 8-bit integer type. */
   uint8_t ui8TaskAddress;                       /*!< 8-bit integer type. */
+  uint16_t ui16Line;                            /*!< 16-bit integer type. */
 }task_t;
 
 //! Debug Mode: Task Storage
