@@ -132,14 +132,24 @@ uint8_t ui8Blink(void* vpArgs){
   vStartCoRoutine();
   while(1){
     /*!
-      Blinking the LED.
+      Turning on the LED.
     */
-    vTogglePin(13);
+    vGenerateLogicLevel(13, HIGH);
     
     /*!
       Task pausing.
     */
-    vTaskDelay(500);
+    vTaskDelay(1000);
+    
+    /*!
+      Turning off the LED.
+    */
+    vGenerateLogicLevel(13, LOW);
+    
+    /*!
+      Task pausing.
+    */
+    vTaskDelay(1000);
   }
   vEndCoRoutine();
 }
