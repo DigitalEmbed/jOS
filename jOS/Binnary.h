@@ -33,58 +33,12 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef jOS_H
-#define jOS_H
+#ifndef Binnary_H
+#define Binnary_H
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
-
-//! Configuration: Task Manager
-/*!
-  Configure the jOS system task manager here.
-*/
-#define   TASK_NAME_SIZE                      12
-#define   NUMBER_OF_PRIORITIES                4
-#define   NUMBER_OF_TASK_IN_A_PRIORITY        4
-#define   NUMBER_OF_TASK_SCHEDULED            20
-#define   SOFTWARE_WATCHDOG_TIME              200
-
-//! Configuration: Semaphores Manager
-/*!
-  Configure the jOS system semaphore manager here.
-*/
-#define   AMOUNT_OF_SWITCHES                  16
-
-//! Path: EmbeddedTools
-/*!
-  Path to EmbeddedTools library.
-*/
-#include <EmbeddedTools.h>
-
-//! Path: Kernel
-/*!
-  Path to jOS system MemoryManager library.
-*/
-#include <MemoryManager.h>
-
-//! Path: Tools
-/*!
-  Path to jOS system task manager libraries.
-*/
-#include "TaskScheduler.h"
-#include "coRoutines.h"
-#include "Switch.h"
 #include "Semaphores.h"
 
-//! Path: System
-/*!
-  Path to jOS system libraries.
-*/
-#include "System.h"
-
-#ifdef __cplusplus
-  }
-#endif
+uint8_t ui8TakeBinnarySemaphore(semaphore_t* smpSemaphore);                     /*!< 8-bit integer type function. */
+uint8_t ui8ReturnBinnarySemaphore(semaphore_t* smpSemaphore);                   /*!< 8-bit integer type function. */
 
 #endif
