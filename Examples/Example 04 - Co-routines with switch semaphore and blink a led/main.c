@@ -114,6 +114,11 @@ uint8_t ui8Task1(void* vpArgs){
       Returning "semaphore".
     */
     ui8ReturnSwitch(*sTaskFlag);
+    
+    /*!
+      Pausing the task.
+    */
+    vTaskYield();
   }
 
   /*!
