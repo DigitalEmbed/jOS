@@ -158,7 +158,14 @@ task_t tBlink;
 uint8_t ui8Blink(void* vpArgs){
   vStartCoRoutine();
   while(1){
+    /*!
+      Blinking the LED.
+    */
     vTogglePin(13);
+    
+    /*!
+      Task pausing.
+    */
     vTaskDelay(500);
   }
   vEndCoRoutine();
