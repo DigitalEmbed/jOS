@@ -1,4 +1,4 @@
-//! Example 04 - Co-routines with switch semaphore and another way to blink a LED
+//! Example 04 - Co-routines with switch and another way to blink a LED
 /*!
   This simply example demonstrates how to share a variable between tasks.
 
@@ -52,17 +52,11 @@ uint8_t ui8Task1(void* vpArgs){
   /*!
     Starting co-routine.
   */
-  vStartCoRoutine();
-
-  /*!
-    Infinite Loop (That's crazy, right?).
-  */
-  while(1){
-
+  coRoutine {
     /*!
       Waiting for "semaphore".
     */
-    vWaitFor(ui8TakeSwitch(*sTaskFlag) == TAKED_SWITCH);
+    vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_OFF_SWITCH);
 
     /*!
       Executing the function when "semaphore" open.
@@ -72,17 +66,12 @@ uint8_t ui8Task1(void* vpArgs){
     /*!
       Returning "semaphore".
     */
-    ui8ReturnSwitch(*sTaskFlag);
-
-    /*!
-      Pausing the task.
-    */
-    vTaskYield();
+    vTurnOnSwitch(*sTaskFlag);
 
     /*!
       Waiting for "semaphore".
     */
-    vWaitFor(ui8TakeSwitch(*sTaskFlag) == TAKED_SWITCH);
+    vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_OFF_SWITCH);
 
     /*!
       Executing the function when "semaphore" open.
@@ -93,17 +82,12 @@ uint8_t ui8Task1(void* vpArgs){
     /*!
       Returning "semaphore".
     */
-    ui8ReturnSwitch(*sTaskFlag);
-
-    /*!
-      Pausing the task.
-    */
-    vTaskYield();
+    vTurnOnSwitch(*sTaskFlag);
 
     /*!
       Waiting for "semaphore".
     */
-    vWaitFor(ui8TakeSwitch(*sTaskFlag) == TAKED_SWITCH);
+    vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_OFF_SWITCH);
 
     /*!
       Executing the function when "semaphore" open.
@@ -113,18 +97,12 @@ uint8_t ui8Task1(void* vpArgs){
     /*!
       Returning "semaphore".
     */
-    ui8ReturnSwitch(*sTaskFlag);
+    vTurnOnSwitch(*sTaskFlag);
     
-    /*!
-      Pausing the task.
-    */
-    vTaskYield();
-  }
-
   /*!
     Co-routine finalization (Without finalization, your code will not work).
   */
-  vEndCoRoutine();
+  } end;
 }
 
 /*!
@@ -133,22 +111,17 @@ uint8_t ui8Task1(void* vpArgs){
 task_t tTask2;
 uint8_t ui8Task2(void* vpArgs){
   static switch_t* sTaskFlag = (switch_t*) vpArgs;
-  vStartCoRoutine();
-  while(1){
-    vWaitFor(ui8TakeSwitch(*sTaskFlag) == TAKED_SWITCH);
+  coRoutine {
+    vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_ON_SWITCH);
     printf("%s: Executing A\n", tpGetCurrentTask()->cpTaskName);
-    ui8ReturnSwitch(*sTaskFlag);
-    vTaskYield();
-    vWaitFor(ui8TakeSwitch(*sTaskFlag) == TAKED_SWITCH);
+    vTurnOffSwitch(*sTaskFlag);
+    vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_ON_SWITCH);
     printf("%s: Executing B\n", tpGetCurrentTask()->cpTaskName);
-    ui8ReturnSwitch(*sTaskFlag);
-    vTaskYield();
-    vWaitFor(ui8TakeSwitch(*sTaskFlag) == TAKED_SWITCH);
+    vTurnOffSwitch(*sTaskFlag);
+    vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_ON_SWITCH);
     printf("%s: Executing C\n", tpGetCurrentTask()->cpTaskName);
-    ui8ReturnSwitch(*sTaskFlag);
-    vTaskYield();
-  }
-  vEndCoRoutine();
+    vTurnOffSwitch(*sTaskFlag);
+  } end;
 }
 
 /*!
@@ -193,9 +166,9 @@ int main(void){
   /*!
     Tasks installations.
   */
-  ui8AddTask(&tTask1, &ui8Task1, "Task1", &sTaskFlag, 0, 50, ENABLED);
-  ui8AddTask(&tTask2, &ui8Task2, "Task2", &sTaskFlag, 0, 50, ENABLED);
-  ui8AddTask(&tBlink, &ui8Blink, "Blink", NULL, 0, MINIMAL_TIME, ENABLED);
+  ui8AddTask(&tTask1, &ui8Task1, "Task1", &sTaskFlag, 0, 100, ENABLED);
+  ui8AddTask(&tTask2, &ui8Task2, "Task2", &sTaskFlag, 0, 100, ENABLED);
+  ui8AddTask(&tBlink, &ui8Blink, "Blink", NULL, 0, 100, ENABLED);
 
   /*!
     Task manager initialization.
