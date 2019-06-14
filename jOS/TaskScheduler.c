@@ -70,6 +70,7 @@ buffer_t* bpScheduledTasks = NULL;                                              
 task_t** tppScheduledTasksVector[NUMBER_OF_TASK_SCHEDULED] = {NULL};                                  /*!< task_t type vector. */
 
 volatile uint8_t ui8LastPriority = 0;                                                                 /*!< 8-bit integer type. */
+volatile uint16_t ui16AmountOfPriorizedTasks = 0;
 
 //! "Static" Variables: Task Storage
 /*!
@@ -77,6 +78,7 @@ volatile uint8_t ui8LastPriority = 0;                                           
 */
 volatile uint8_t ui8SchedulerStatus = ON_HOLD;                                                        /*!< 8-bit integer type. */
 
+void vTaskSchedulerUpdate(uint8_t ui8RequiredStatus, uint8_t ui8Decrement);                           /*!< Void type function. */
 void vSchedulerInterrupt();                                                                           /*!< Void type function. */
 void vCheckTaskReturn(uint8_t ui8TaskReturn);                                                         /*!< Void type function. */
 
@@ -134,6 +136,9 @@ uint8_t ui8AddTask(task_t* tpTask, pfunc_t pfFunction, const char* cpTaskName, v
   if (tpTask->ui8Status == NOT_INSTALLED){
     return TASK_CREATED;
   }
+  else if (tpTask->ui8Status == PRIORIZED){
+    ui16AmountOfPriorizedTasks++;
+  }
   if (ui8NumberOfTasks[ui8Priority] == 0){
     tpTask->ui8TaskAddress = 0;
     ui16TaskArrayTimer[ui8Priority][0] = ui16Period;
@@ -186,6 +191,9 @@ uint8_t ui8AddTask(task_t* tpTask, pfunc_t pfFunction, const char* cpTaskName, v
 uint8_t ui8RemoveTask(task_t* tpTask){
   if (tpTask->ui8Status == NOT_INSTALLED){
     return ERROR_TASK_NOT_REMOVED;
+  }
+  else if (tpTask->ui8Status == PRIORIZED){
+    ui16AmountOfPriorizedTasks--;
   }
   tpTask->ui8Status = NOT_INSTALLED;
   uint8_t ui8Priority = tpTask->ui8Priority;
@@ -280,54 +288,35 @@ uint8_t ui8RestartTimerTask(task_t* tpTask){
   \return Returns ERROR_TASK_PERIOD_NOT_CHANGED or TASK_PERIOD_CHANGED.
 */
 uint8_t ui8ChangeTaskPeriod(task_t* tpTask, uint16_t ui16Period){
-  if(ui8RemoveTask(tpTask) == ERROR_TASK_NOT_REMOVED){
+  uint8_t ui8TaskCounter = 0;
+  if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
+    ui16TaskArrayTimer[tpTask->ui8Priority][tpTask->ui8TaskAddress] = ui16Period;
+    for (ui8TaskCounter = 0 ; ui8TaskCounter < NUMBER_OF_TASK_SCHEDULED ; ui8TaskCounter++){
+      if (*tppScheduledTasksVector[ui8TaskCounter] == tpTask){
+        tppScheduledTasksVector[ui8TaskCounter] = NULL;
+      }
+    }
+    return TASK_PERIOD_CHANGED;
+  }
+  else{
     return ERROR_TASK_PERIOD_NOT_CHANGED;
   }
-  if(ui8AddTask(tpTask, tpTask->pfFunction, (const char*) tpTask->cpTaskName, faTaskArguments[tpTask->ui8Priority][tpTask->ui8TaskAddress], tpTask->ui8Priority, ui16Period, tpTask->ui8Status) == ERROR_TASK_NOT_ADDED){
-    return ERROR_TASK_PERIOD_NOT_CHANGED;
-  }
-  return TASK_PERIOD_CHANGED;
 }
 
-//! Function: Task Priority Changer
+//! Function: Task Period Restorer
 /*!
-  Change a task priority from task manager.
+  Change a task period from task manager.
   \param tpTask is a task_t pointer type.
-  \param ui8Priority is a 8-bit integer type. This is the priority of the task.
-  \return Returns ERROR_TASK_PRIORITY_NOT_CHANGED or TASK_PRIORITY_CHANGED.
+  \return Returns ERROR_TASK_PERIOD_NOT_CHANGED or TASK_PERIOD_CHANGED.
 */
-uint8_t ui8ChangeTaskPriority(task_t* tpTask, uint8_t ui8Priority){
-  if (ui8NumberOfTasks[ui8Priority] >= (NUMBER_OF_TASK_IN_A_PRIORITY - 1)){
+uint8_t ui8RestoreTaskPeriod(task_t* tpTask){
+  if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
+    ui16TaskArrayTimer[tpTask->ui8Priority][tpTask->ui8TaskAddress] = tpTask->ui16Period;
+    return TASK_PERIOD_CHANGED;
+  }
+  else{
     return ERROR_TASK_PERIOD_NOT_CHANGED;
   }
-  if(ui8RemoveTask(tpTask) == ERROR_TASK_NOT_REMOVED){
-    return ERROR_TASK_PRIORITY_NOT_CHANGED;
-  }
-  if(ui8AddTask(tpTask, tpTask->pfFunction, (const char*) tpTask->cpTaskName, faTaskArguments[tpTask->ui8Priority][tpTask->ui8TaskAddress], ui8Priority, tpTask->ui16Period, tpTask->ui8Status) == ERROR_TASK_NOT_ADDED){
-    return ERROR_TASK_PRIORITY_NOT_CHANGED;
-  }
-  return TASK_PRIORITY_CHANGED;
-}
-
-//! Function: Task Execution Changer
-/*!
-  Change a task period and priority from task manager.
-  \param tpTask is a task_t pointer type.
-  \param ui8Priority is a 8-bit integer type. This is the priority of the task.
-  \param ui16Period is a 16-bit integer type. This is the period that task will be executed.
-  \return Returns ERROR_TASK_PRIORITY_NOT_CHANGED or TASK_PRIORITY_CHANGED.
-*/
-uint8_t ui8ChangeTaskExecution(task_t* tpTask, uint8_t ui8Priority, uint16_t ui16Period){
-  if (ui8NumberOfTasks[ui8Priority] >= (NUMBER_OF_TASK_IN_A_PRIORITY - 1)){
-    return ERROR_TASK_EXECUTION_NOT_CHANGED;
-  }
-  if(ui8RemoveTask(tpTask) == ERROR_TASK_NOT_REMOVED){
-    return ERROR_TASK_EXECUTION_NOT_CHANGED;
-  }
-  if(ui8AddTask(tpTask, tpTask->pfFunction, (const char*) tpTask->cpTaskName, tpTask->vpArguments, ui8Priority, ui16Period, tpTask->ui8Status) == ERROR_TASK_NOT_ADDED){
-    return ERROR_TASK_EXECUTION_NOT_CHANGED;
-  }
-  return TASK_EXECUTION_CHANGED;
 }
 
 //! Function: Task Priorizer
@@ -339,6 +328,24 @@ uint8_t ui8ChangeTaskExecution(task_t* tpTask, uint8_t ui8Priority, uint16_t ui1
 uint8_t ui8PriorizeTask(task_t* tpTask){
   if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
     tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress]->ui8Status = PRIORIZED;
+    ui16AmountOfPriorizedTasks++;
+    return TASK_PRIORIZED;
+  }
+  else{
+    return ERROR_TASK_NOT_PRIORIZED;
+  }
+}
+
+//! Function: Task Depriver
+/*!
+  Deprive a task on task manager.
+  \param tpTask is a task_t pointer type.
+  \return Returns ERROR_TASK_NOT_PRIORIZED or TASK_PRIORIZED.
+*/
+uint8_t ui8DepriveTask(task_t* tpTask){
+  if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
+    tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress]->ui8Status = ENABLED;
+    ui16AmountOfPriorizedTasks--;
     return TASK_PRIORIZED;
   }
   else{
@@ -360,86 +367,6 @@ uint8_t ui8ChangeTaskArgument(task_t* tpTask, void* vpArgument){
   }
   else{
     return ERROR_TASK_ARGUMENT_NOT_CHANGED;
-  }
-}
-
-//! Function: Scheduler Interrupt
-/*!
-  This is the task manager: When a timer burst, this function is called. This is the task manager: Tasks that have their time equal to 0 are stored in a FIFO buffer and are scheduled to run.
-*/
-void vSchedulerInterrupt(){
-  vSystemWakeUp();
-  static uint8_t ui8PriorityCounter = 0;
-  static uint8_t ui8TaskCounter = 0;
-  ui16SystemTimer++;
-  if (ui16SystemTimer == SOFTWARE_WATCHDOG_TIME && ui8SchedulerStatus == RUNNING_TASK){
-    vSystemRestart();
-  }
-  for (ui8PriorityCounter = 0 ; ui8PriorityCounter <= ui8LastPriority ; ui8PriorityCounter++){
-    for (ui8TaskCounter = 0 ; tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL ; ui8TaskCounter++){
-      if (tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL){
-        if(ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] == 0){
-          if (ui8GetAmountOfPendingData(bpScheduledTasks) < NUMBER_OF_TASK_SCHEDULED && tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL && (tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status == ENABLED || tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status == PRIORIZED)){
-            ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] = tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui16Period;
-            task_t* tpBuffer = (task_t*) tpTaskArray[ui8PriorityCounter][ui8TaskCounter];
-            vPushBufferData(bpScheduledTasks, &tpBuffer);
-            faScheduledTasksArguments[ui8GetWritePosition(bpScheduledTasks)] = faTaskArguments[ui8PriorityCounter][ui8TaskCounter];
-          }
-        }
-        else{
-          if (tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status == PRIORIZED && ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] > (uint8_t)(ui8TickMS << 2)){
-            ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] -= (ui8TickMS << 2);
-          }
-          else if (tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status == ENABLED && ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] > ui8TickMS){
-            ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] -= ui8TickMS;
-          }
-          else{
-            ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] = 0;
-          }
-        }
-      }
-    }
-  }
-}
-
-//! Function: Scheduler Starter
-/*!
-  If have a pending task on buffer, the task runs.
-*/
-void vStartScheduler(){
-  task_t** tppBuffer = (task_t**) vpPullBufferData(bpScheduledTasks);
-  while (ui8GetAmountOfPendingData(bpScheduledTasks) > 0 && *tppBuffer != NULL && (*tppBuffer)->ui8Status == DISABLED){
-    tppBuffer = (task_t**) vpPullBufferData(bpScheduledTasks);
-  }
-  if (tppBuffer != NULL){
-    void* vpBufferArguments = faScheduledTasksArguments[ui8GetReadPosition(bpScheduledTasks)];
-    tpCurrentTask = *tppBuffer;
-    ui16SystemTimer = 0;
-    ui8SchedulerStatus = RUNNING_TASK;
-    vSystemRestartTimerInit();
-    register uint8_t ui8TaskReturn = tpCurrentTask->pfFunction(vpBufferArguments);
-    vSystemRestartTimerStop();
-    ui8SchedulerStatus = ON_HOLD;
-    ui16SystemTimer = 0;
-    vCheckTaskReturn(ui8TaskReturn);
-  }
-  else{
-    vSystemSleep();
-  }
-}
-
-//! Function: Check Current Task
-/*!
-  Check if the parameter task is the current task.
-  \param tpTask is a task_t pointer type.
-  \return Returns CURRENT_TASK or NOT_CURRENT_TASK.
-*/
-uint8_t ui8CheckCurrentTask(task_t* tpTask){
-  if (tpTask == tpCurrentTask){
-    return CURRENT_TASK;
-  }
-  else{
-    return NOT_CURRENT_TASK;
   }
 }
 
@@ -485,6 +412,99 @@ void* vpGetArguments(task_t* tpTask){
     return faTaskArguments[tpTask->ui8Priority][tpTask->ui8TaskAddress];
   }
   return NULL;
+}
+
+// Function: Task Scheduler Updater
+/*!
+  This function is responsible for task scheduler updating.
+*/
+void vTaskSchedulerUpdate(uint8_t ui8RequiredStatus, uint8_t ui8Decrement){
+  uint8_t ui8PriorityCounter = 0;
+  uint8_t ui8TaskCounter = 0;
+  uint16_t ui16ProcessedPriorizedTasks = 0;
+  if (ui16AmountOfPriorizedTasks == 0 && ui8RequiredStatus == PRIORIZED){
+    return;
+  }
+  for (ui8PriorityCounter = 0 ; ui8PriorityCounter <= ui8LastPriority ; ui8PriorityCounter++){
+    for (ui8TaskCounter = 0 ; tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL ; ui8TaskCounter++){
+      if (tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL){
+        if(ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] == 0){
+          if (ui8GetAmountOfPendingData(bpScheduledTasks) < NUMBER_OF_TASK_SCHEDULED && tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL && tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status == ui8RequiredStatus){
+            ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] = tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui16Period;
+            task_t* tpBuffer = (task_t*) tpTaskArray[ui8PriorityCounter][ui8TaskCounter];
+            vPushBufferData(bpScheduledTasks, &tpBuffer);
+            faScheduledTasksArguments[ui8GetWritePosition(bpScheduledTasks)] = faTaskArguments[ui8PriorityCounter][ui8TaskCounter];
+            if (tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status == PRIORIZED && ui8RequiredStatus == PRIORIZED){
+              if (ui16AmountOfPriorizedTasks > ui16ProcessedPriorizedTasks){
+                ui16ProcessedPriorizedTasks++;
+              }
+              else{
+                return;
+              }
+            }
+          }
+        }
+        else{
+          if (tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status == ui8RequiredStatus){
+            if (ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] >= ui8Decrement){
+              ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] -= ui8Decrement;
+            }
+            else{
+              ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] = 0;
+            }
+            if (tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status == PRIORIZED && ui8RequiredStatus == PRIORIZED){
+              if (ui16AmountOfPriorizedTasks > ui16ProcessedPriorizedTasks){
+                ui16ProcessedPriorizedTasks++;
+              }
+              else{
+                return;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+//! Function: Scheduler Interrupt
+/*!
+  This is the task manager: When a timer burst, this function is called. This is the task manager: Tasks that have their time equal to 0 are stored in a FIFO buffer and are scheduled to run.
+*/
+void vSchedulerInterrupt(){
+  vSystemWakeUp();
+  ui16SystemTimer++;
+  if (ui16SystemTimer == SOFTWARE_WATCHDOG_TIME && ui8SchedulerStatus == RUNNING_TASK){
+    vSystemRestart();
+  }
+  vTaskSchedulerUpdate(PRIORIZED, (ui8TickMS << 2));
+  vTaskSchedulerUpdate(ENABLED, ui8TickMS);
+}
+
+//! Function: Scheduler Starter
+/*!
+  If have a pending task on buffer, the task runs.
+*/
+void vStartScheduler(){
+  task_t** tppBuffer = (task_t**) vpPullBufferData(bpScheduledTasks);
+  while (ui8GetAmountOfPendingData(bpScheduledTasks) > 0 && *tppBuffer != NULL && (*tppBuffer)->ui8Status == DISABLED){
+    tppBuffer = (task_t**) vpPullBufferData(bpScheduledTasks);
+  }
+  if (tppBuffer != NULL){
+    void* vpBufferArguments = faScheduledTasksArguments[ui8GetReadPosition(bpScheduledTasks)];
+    tpCurrentTask = *tppBuffer;
+    ui16SystemTimer = 0;
+    ui8SchedulerStatus = RUNNING_TASK;
+    vSystemRestartTimerInit();
+    register uint8_t ui8TaskReturn = tpCurrentTask->pfFunction(vpBufferArguments);
+    vSystemRestartTimerStop();
+    ui8SchedulerStatus = ON_HOLD;
+    ui16SystemTimer = 0;
+    vCheckTaskReturn(ui8TaskReturn);
+  }
+  else{
+    vSystemSleep();
+  }
 }
 
 //! Function: Scheduler Starter

@@ -146,13 +146,12 @@ uint8_t ui8AddTask(task_t* tpTask, pfunc_t pfFunction, const char* cpTaskName, v
 uint8_t ui8RemoveTask(task_t* tpTask);                                                                                                                                	/*!< 8-bit integer type function. */
 uint8_t ui8EnableTask(task_t* tpTask);                                                                                                                                	/*!< 8-bit integer type function. */
 uint8_t ui8DisableTask(task_t* tpTask);                                                                                                                               	/*!< 8-bit integer type function. */
+uint8_t ui8PriorizeTask(task_t* tpTask);                                                                                                                                /*!< 8-bit integer type function. */
+uint8_t ui8DepriveTask(task_t* tpTask);                                                                                                                                 /*!< 8-bit integer type function. */
 uint8_t ui8RestartTimerTask(task_t* tpTask);																																																														/*!< 8-bit integer type function. */
 uint8_t ui8ChangeTaskPeriod(task_t* tpTask, uint16_t ui16Period);                                                                                                     	/*!< 8-bit integer type function. */
-uint8_t ui8ChangeTaskPriority(task_t* tpTask, uint8_t ui8Priority);                                                                                                   	/*!< 8-bit integer type function. */
+uint8_t ui8RestoreTaskPeriod(task_t* tpTask);                                                                                                                           /*!< 8-bit integer type function. */
 uint8_t ui8ChangeTaskArgument(task_t* tpTask, void* vpArgument);                                                                                                      	/*!< 8-bit integer type function. */
-uint8_t ui8ChangeTaskExecution(task_t* tpTask, uint8_t ui8Priority, uint16_t ui16Period);
-uint8_t ui8PriorizeTask(task_t* tpTask);
-uint8_t ui8CheckCurrentTask(task_t* tpTask);                                                                                                                          	/*!< 8-bit integer type function. */
 task_t* tpGetCurrentTask();                                                                                                                                           	/*!< task_t pointer type function. */
 task_t* tpFindTask(const char* cpTaskName);                                                                                                                           	/*!< task_t pointer type function. */
 void* vpGetArguments(task_t* tpTask);                                                                                                                                 	/*!< void pointer type function. */

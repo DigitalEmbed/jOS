@@ -50,11 +50,8 @@
 #define   ERROR_SWITCH_NOT_INITIALIZED      0
 #define   SWITCH_INITIALIZED                1
 
-#define   TAKED_SWITCH                      0
-#define   SWITCH_BUSY                       1
-#define   RETURNED_SWITCH                   2
-#define   TASK_HOLDER                       23
-#define   TASK_NOT_HOLDER                   24
+#define   TURNED_OFF_SWITCH                 0
+#define   TURNED_ON_SWITCH                  1
 
 //! Type Definition: switch_t
 /*!
@@ -62,11 +59,10 @@
 */
 typedef uint8_t switch_t;
 
-uint8_t ui8SwitchInit(switch_t* spSwitch);         /*!< 8-bits integer type function. */
-uint8_t ui8TakeSwitch(switch_t sSwitch);           /*!< 8-bits integer type function. */
-uint8_t ui8ReturnSwitch(switch_t sSwitch);         /*!< 8-bits integer type function. */
-uint8_t ui8GetSwitchStatus(switch_t sSwitch);      /*!< 8-bits integer type function. */
-uint8_t ui8IsThisMySwitch(switch_t sSwitch);       /*!< 8-bits integer type function. */
+uint8_t ui8SwitchInit(switch_t* spSwitch);          /*!< 8-bits integer type function. */
+void vTurnOnSwitch(switch_t sSwitch);               /*!< 8-bits integer type function. */
+void vTurnOffSwitch(switch_t sSwitch);              /*!< 8-bits integer type function. */
+uint8_t ui8GetSwitchStatus(switch_t sSwitch);       /*!< 8-bits integer type function. */
 
 #ifdef __cplusplus
   }

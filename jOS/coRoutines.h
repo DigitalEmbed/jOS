@@ -33,8 +33,8 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef CoRoutines_H
-#define CoRoutines_H
+#ifndef coRoutines_H
+#define coRoutines_H
 
 #ifdef __cplusplus
   extern "C" {
@@ -42,19 +42,24 @@
 
 #include "TaskScheduler.h"
 
-#define   vStartCoRoutine()           static task_t* tpCurrentTask = tpGetCurrentTask();\
+#define   COUNTER_OVERFLOW            1
+#define   COUNTER_RUNNING             0
+
+#define   coRoutine                   static task_t* tpCurrentTask = tpGetCurrentTask();\
                                       switch(tpCurrentTask->ui16Line){\
                                         case 0:
 
-#define   vTaskYield()                tpCurrentTask->ui16Line = __LINE__ ; return TASK_END; case __LINE__:
-
-#define   vEndCoRoutine()             }\
+#define   end                         }\
                                       tpCurrentTask->ui16Line = 0;\
                                       return TASK_END;
+
+#define   vTaskYield()                tpCurrentTask->ui16Line = __LINE__ ; return TASK_END ; case __LINE__:
 
 #define   vWaitUntil(xCondition)      tpCurrentTask->ui16Line = __LINE__ ; case __LINE__: if ((xCondition)) return TASK_END;
 
 #define   vWaitFor(xCondition)        tpCurrentTask->ui16Line = __LINE__ ; case __LINE__: if (!(xCondition)) return TASK_END;
+
+#define   vTaskDelay(ui16Time)        ui8ChangeTaskPeriod(tpGetCurrentTask(), ui16Time) , tpCurrentTask->ui16Line = __LINE__ ; return TASK_END; case __LINE__: ui8RestoreTaskPeriod(tpGetCurrentTask());
 
 #ifdef __cplusplus
   }
