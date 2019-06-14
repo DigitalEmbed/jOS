@@ -1,4 +1,4 @@
-//! Example 04 - Co-routines with switch semaphore and blink a led
+//! Example 04 - Co-routines with switch semaphore and another way to blink a LED
 /*!
   This simply example demonstrates how to share a variable between tasks.
 
@@ -156,8 +156,12 @@ uint8_t ui8Task2(void* vpArgs){
 */
 task_t tBlink;
 uint8_t ui8Blink(void* vpArgs){
-  vTogglePin(13);
-  return TASK_END;
+  vStartCoRoutine();
+  while(1){
+    vTogglePin(13);
+    vTaskDelay(500);
+  }
+  vEndCoRoutine();
 }
 
 int main(void){
@@ -184,7 +188,7 @@ int main(void){
   */
   ui8AddTask(&tTask1, &ui8Task1, "Task1", &sTaskFlag, 0, 50, ENABLED);
   ui8AddTask(&tTask2, &ui8Task2, "Task2", &sTaskFlag, 0, 50, ENABLED);
-  ui8AddTask(&tBlink, &ui8Blink, "Blink", NULL, 0, 500, ENABLED);
+  ui8AddTask(&tBlink, &ui8Blink, "Blink", NULL, 0, MINIMAL_TIME, ENABLED);
 
   /*!
     Task manager initialization.
