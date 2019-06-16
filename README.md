@@ -24,9 +24,17 @@ On the other hand, the advantage of the cooperative model resides in the simplic
 
 Each type of RTOS addresses a range of problems. It is up to the developer to choose what fits best in their solution.
 
+### Co-routines
+
+Co-routine is a component of a program that generalizes subroutines to allow multiple entry points and suspend and resume execution at certain points in the code. With this, your codes will be very close to a preemptive code, with some advantages and disadvantages. An advantage that stands out is the extremely simple implementation. However, all variables declared within the function that uses co-routine must be declared statically, so that they are not lost during the context switch. This causes you to have a slightly higher memory cost.
+
+### Semaphores
+
+It is used to share resources, and to communicate between tasks. While a task uses a given feature it can block a semaphore; another task before using this feature checks the state of the semaphore, and if it is locked, it does not use the feature. You can expect the feature to be released, or you can perform other functions.
+
 ### Binary Switches
 
-A binary switches has the states locked or unlocked. It is used to share resources, and to communicate between tasks. While a task uses a given feature it can block a semaphore; another task before using this feature checks the state of the semaphore, and if it is locked, it does not use the feature. You can expect the feature to be released, or you can perform other functions. Switches are more free and faster than semaphores, but is less safe.
+A binary switches has the states turned on or turned off. Switches are more free and faster than semaphores, but is less safe.
 
 ### Prerequisites
 
@@ -150,9 +158,17 @@ Por outro lado, a vantagem do modelo cooperativo reside na simplicidade do desen
 
 Cada tipo de RTOS atende uma gama de problemas. Cabe ao desenvolvedor escolher o que melhor se adapta na sua solução.
 
+### Co-rotinas
+
+Co-rotina é um componente de um programa que generaliza subrotinas para permitir múltiplos pontos de entrada e a suspensão e o resumo da execução em determinados pontos do código. Com isso, seus códigos ficarão muito próximo a um código preemptivo, com algumas vantagens e desvantagens. Uma vantagem que vale ressaltar é a implementação extremamente simples. Todavia, todas as variáveis declaradas dentro da função que utiliza co-rotina devem ser declaradas de forma estática, para que as mesmas não se percam durante a troca de contexto. Isso faz com que você tenha um custo de memória um pouco mais alto.
+
+### Semáforos
+
+É usado para partilhar recursos, e para comunicação entre tarefas. Enquanto uma tarefa utiliza um dado recurso pode bloquear um semáforo; outra tarefa antes de utilizar esse recurso verifica o estado do semáforo, e se estiver bloqueado, não utiliza o recurso. Pode esperar que, o recurso fique liberto, ou pode executar outras funções.
+
 ### Chaves Binárias
 
-Uma chave binária tem os estados de bloqueado ou desbloqueado. É usado para partilhar recursos, e para comunicação entre tarefas. Enquanto uma tarefa utiliza um dado recurso pode bloquear um semáforo; outra tarefa antes de utilizar esse recurso verifica o estado do semáforo, e se estiver bloqueado, não utiliza o recurso. Pode esperar que, o recurso fique liberto, ou pode executar outras funções. Embora seja menos segura, uma chave é em mais leve e mais rápida que um semáforo.
+Uma chave binária tem os estados ligado ou desligado. Embora seja menos segura, uma chave é em mais leve e mais rápida que um semáforo.
 
 ### Pré-Requisitos
 
