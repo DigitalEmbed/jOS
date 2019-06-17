@@ -66,6 +66,7 @@
 #define     TASK_PRIORIZED                      9
 #define     CURRENT_TASK                        10
 #define     TASK_TIMER_RESTARTED                11
+#define     TASK_DEPRIVED                       12
 #define     TASK_CREATED                        100
 
 #define     ERROR_PRIORITY_FULL                 10
@@ -80,6 +81,7 @@
 #define     ERROR_TASK_NOT_PRIORIZED            19
 #define     NOT_CURRENT_TASK                    20
 #define     TASK_TIMER_NOT_RESTARTED            21
+#define     ERROR_TASK_NOT_DEPRIVED             22
 #define     NO_SUCH_MEMORY                      106
 
 //! Macros: Task Status
@@ -121,25 +123,6 @@ typedef struct {
   uint8_t ui8TaskAddress;                       /*!< 8-bit integer type. */
   uint16_t ui16Line;                            /*!< 16-bit integer type. */
 }task_t;
-
-//! Debug Mode: Task Storage
-/*!
-  These variables are for storing tasks in the task manager.
-*/
-/*typedef void* fargs_t;
-
-  extern volatile task_t* tpTaskArray[NUMBER_OF_PRIORITIES][NUMBER_OF_TASK_IN_A_PRIORITY];
-  extern volatile fargs_t faTaskArguments[NUMBER_OF_PRIORITIES][NUMBER_OF_TASK_IN_A_PRIORITY];
-  extern volatile uint16_t ui16TaskArrayTimer[NUMBER_OF_PRIORITIES][NUMBER_OF_TASK_IN_A_PRIORITY];
-  extern volatile uint16_t ui16SystemTimer;
-  extern volatile task_t* tpCurrentTask;
-  extern volatile uint8_t ui8NumberOfTasks[NUMBER_OF_PRIORITIES];
-  extern task_t** tppScheduledTasksVector[NUMBER_OF_TASK_SCHEDULED];
-  extern volatile fargs_t faScheduledTasksArguments[NUMBER_OF_TASK_SCHEDULED];
-  extern buffer_t* bpScheduledTasks;
-  extern task_t** tppScheduledTasksVector[NUMBER_OF_TASK_SCHEDULED];
-  extern volatile uint8_t ui8LastPriority;
-*/
 
 uint8_t ui8TaskManagerInit();                                                                                                                                         	/*!< 8-bit integer type function. */
 uint8_t ui8AddTask(task_t* tpTask, pfunc_t pfFunction, const char* cpTaskName, void* vpArguments, uint8_t ui8Priority, uint16_t ui16Period, uint8_t ui8Status);     		/*!< 8-bit integer type function. */

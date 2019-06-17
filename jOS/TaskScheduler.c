@@ -44,6 +44,7 @@
 */
 #define   ON_HOLD         0
 #define   RUNNING_TASK    1
+#define   STOP_SCHEDULER  2
 
 //! Type Definition: fargs_t
 /*!
@@ -55,22 +56,23 @@ typedef void* fargs_t;
 /*!
   These variables are for storing tasks in the task manager.
 */
-volatile task_t* tpTaskArray[NUMBER_OF_PRIORITIES][NUMBER_OF_TASK_IN_A_PRIORITY] = {{NULL}};          /*!< task_t pointer type array. */
-volatile fargs_t faTaskArguments[NUMBER_OF_PRIORITIES][NUMBER_OF_TASK_IN_A_PRIORITY] = {{NULL}};      /*!< fargs_t type array. */
+volatile task_t* tpTaskArray[AMOUNT_OF_PRIORITIES][AMOUNT_OF_TASK_IN_A_PRIORITY] = {{NULL}};          /*!< task_t pointer type array. */
+volatile task_t* tpPriorizedTaskVector[AMOUNT_OF_PRIORIZED_TASKS] = {NULL};                           /*!< task_t pointer type vector. */
+volatile fargs_t faTaskArguments[AMOUNT_OF_PRIORITIES][AMOUNT_OF_TASK_IN_A_PRIORITY] = {{NULL}};      /*!< fargs_t type array. */
 
-volatile uint16_t ui16TaskArrayTimer[NUMBER_OF_PRIORITIES][NUMBER_OF_TASK_IN_A_PRIORITY] = {{0}};     /*!< 16-bit integer type vector. */
+volatile uint16_t ui16TaskArrayTimer[AMOUNT_OF_PRIORITIES][AMOUNT_OF_TASK_IN_A_PRIORITY] = {{0}};     /*!< 16-bit integer type vector. */
 volatile uint16_t ui16SystemTimer = 0;                                                                /*!< 16-bit integer type. */
 
 volatile task_t* tpCurrentTask = NULL;                                                                /*!< task_t pointer type. */
 
-volatile uint8_t ui8NumberOfTasks[NUMBER_OF_PRIORITIES] = {0};                                        /*!< 8-bit integer type. */
+volatile uint8_t ui8AmountOfTasks[AMOUNT_OF_PRIORITIES] = {0};                                        /*!< 8-bit integer type. */
 
-volatile fargs_t faScheduledTasksArguments[NUMBER_OF_TASK_SCHEDULED] = {NULL};                        /*!< fargs_t type vector. */
+volatile fargs_t faScheduledTasksArguments[AMOUNT_OF_TASK_SCHEDULED] = {NULL};                        /*!< fargs_t type vector. */
 buffer_t* bpScheduledTasks = NULL;                                                                    /*!< buffer_t pointer type. */
-task_t** tppScheduledTasksVector[NUMBER_OF_TASK_SCHEDULED] = {NULL};                                  /*!< task_t type vector. */
+task_t** tppScheduledTasksVector[AMOUNT_OF_TASK_SCHEDULED] = {NULL};                                  /*!< task_t type vector. */
 
 volatile uint8_t ui8LastPriority = 0;                                                                 /*!< 8-bit integer type. */
-volatile uint16_t ui16AmountOfPriorizedTasks = 0;
+volatile uint16_t ui16AmountOfPriorizedTasks = 0;                                                     /*!< 16-bit integer type. */
 
 //! "Static" Variables: Task Storage
 /*!
@@ -78,7 +80,6 @@ volatile uint16_t ui16AmountOfPriorizedTasks = 0;
 */
 volatile uint8_t ui8SchedulerStatus = ON_HOLD;                                                        /*!< 8-bit integer type. */
 
-void vTaskSchedulerUpdate(uint8_t ui8RequiredStatus, uint8_t ui8Decrement);                           /*!< Void type function. */
 void vSchedulerInterrupt();                                                                           /*!< Void type function. */
 void vCheckTaskReturn(uint8_t ui8TaskReturn);                                                         /*!< Void type function. */
 
@@ -91,7 +92,7 @@ uint8_t ui8TaskManagerInit(){
   if (ui8BufferManagerInit() != BUFFER_INITIALIZED){
     return BUFFER_MANAGER_ERROR;
   }
-  bpScheduledTasks = bpCreateGenericBuffer(tppScheduledTasksVector, QUEUE, sizeof(task_t**), NUMBER_OF_TASK_SCHEDULED);
+  bpScheduledTasks = bpCreateGenericBuffer(tppScheduledTasksVector, QUEUE, sizeof(task_t**), AMOUNT_OF_TASK_SCHEDULED);
   if (bpScheduledTasks == NULL){
     return TASK_SCHEDULED_BUFFER_ERROR;
   }
@@ -114,15 +115,19 @@ uint8_t ui8TaskManagerInit(){
   \return Returns ERROR_TASK_NOT_ADDED, ERROR_PRIORITY_FULL, EXISTING_TASK or TASK_ADDED.
 */
 uint8_t ui8AddTask(task_t* tpTask, pfunc_t pfFunction, const char* cpTaskName, void* vpArguments, uint8_t ui8Priority, uint16_t ui16Period, uint8_t ui8Status){
-  if (tpTask == NULL || pfFunction == NULL || ui8Priority >= NUMBER_OF_PRIORITIES || (ui8Status != ENABLED && ui8Status != DISABLED && ui8Status != PRIORIZED)){
+  uint8_t ui8BufferSchedulerStatus = ui8SchedulerStatus;
+  ui8SchedulerStatus = STOP_SCHEDULER;
+  if (tpTask == NULL || pfFunction == NULL || ui8Priority >= AMOUNT_OF_PRIORITIES || (ui8Status != ENABLED && ui8Status != DISABLED && ui8Status != PRIORIZED)){
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return ERROR_TASK_NOT_ADDED;
   }
-  if (ui8NumberOfTasks[ui8Priority] >= NUMBER_OF_TASK_IN_A_PRIORITY){
+  if (ui8AmountOfTasks[ui8Priority] >= AMOUNT_OF_TASK_IN_A_PRIORITY){
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return ERROR_PRIORITY_FULL;
   }
-  int16_t i16Counter = 0;
   tpTask->cpTaskName = (char*) vpDBAlloc(sizeof(char), TASK_NAME_SIZE + 1);
   if (tpTask->cpTaskName == NULL){
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return NO_SUCH_MEMORY;
   }
   memset(tpTask->cpTaskName, 0, TASK_NAME_SIZE + 1);
@@ -130,56 +135,38 @@ uint8_t ui8AddTask(task_t* tpTask, pfunc_t pfFunction, const char* cpTaskName, v
   tpTask->pfFunction = pfFunction;
   tpTask->ui8Priority = ui8Priority;
   tpTask->ui16Period = ui16Period;
-  tpTask->ui8Status = ui8Status;
   tpTask->vpArguments = vpArguments;
   tpTask->ui16Line = 0;
-  if (tpTask->ui8Status == NOT_INSTALLED){
+  if (ui8Status == NOT_INSTALLED){
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return TASK_CREATED;
   }
-  else if (tpTask->ui8Status == PRIORIZED){
-    ui16AmountOfPriorizedTasks++;
-  }
-  if (ui8NumberOfTasks[ui8Priority] == 0){
-    tpTask->ui8TaskAddress = 0;
-    ui16TaskArrayTimer[ui8Priority][0] = ui16Period;
-    tpTaskArray[ui8Priority][0] = tpTask;
-    faTaskArguments[ui8Priority][0] = vpArguments;
-    ui8NumberOfTasks[ui8Priority]++;
-    if (ui8Priority > ui8LastPriority){
-      ui8LastPriority = ui8Priority;
-    }
-    return TASK_ADDED;
+  else if (ui8Status == PRIORIZED){
+    tpTask->ui8Status = ENABLED;
   }
   else{
-    for (i16Counter = 0 ; i16Counter < ui8NumberOfTasks[ui8Priority] ; i16Counter++){
-      if(tpTaskArray[ui8Priority][i16Counter] == tpTask){
-        return EXISTING_TASK;
-      }
+    tpTask->ui8Status = ui8Status;
+  }
+  tpTask->ui8TaskAddress = ui8AmountOfTasks[ui8Priority];
+  ui16TaskArrayTimer[ui8Priority][tpTask->ui8TaskAddress] = ui16Period;
+  tpTaskArray[ui8Priority][tpTask->ui8TaskAddress] = tpTask;
+  faTaskArguments[ui8Priority][tpTask->ui8TaskAddress] = vpArguments;
+  ui8AmountOfTasks[ui8Priority]++;
+  ui8LastPriority = iBigger(ui8LastPriority, ui8Priority);
+  if (ui8Status == PRIORIZED){
+    if (ui8PriorizeTask(tpTask) == TASK_PRIORIZED){
+      ui8SchedulerStatus = ui8BufferSchedulerStatus;
+      return TASK_ADDED;
     }
-    i16Counter = ui8NumberOfTasks[ui8Priority] - 1;
-    while(i16Counter > -1){
-      if (tpTaskArray[ui8Priority][i16Counter]->ui16Period < ui16Period){
-        tpTaskArray[ui8Priority][i16Counter]->ui8TaskAddress++;
-        tpTaskArray[ui8Priority][i16Counter + 1] = tpTaskArray[ui8Priority][i16Counter];
-        ui16TaskArrayTimer[ui8Priority][i16Counter + 1] = ui16TaskArrayTimer[ui8Priority][i16Counter];
-        faTaskArguments[ui8Priority][i16Counter + 1] = faTaskArguments[ui8Priority][i16Counter];
-      }
-      else{
-        break;
-      }
-      i16Counter--;
+    else{
+      ui8SchedulerStatus = ui8BufferSchedulerStatus;
+      return ERROR_TASK_NOT_ADDED;
     }
-    tpTask->ui8TaskAddress = i16Counter + 1;
-    tpTaskArray[ui8Priority][tpTask->ui8TaskAddress] = tpTask;
-    ui16TaskArrayTimer[ui8Priority][tpTask->ui8TaskAddress] = ui16Period;
-    faTaskArguments[ui8Priority][tpTask->ui8TaskAddress] = vpArguments;
-    ui8NumberOfTasks[ui8Priority]++;
-    if (ui8Priority > ui8LastPriority){
-      ui8LastPriority = ui8Priority;
-    }
+  }
+  else{
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return TASK_ADDED;
   }
-  return ERROR_TASK_NOT_ADDED;
 }
 
 //! Function: Task Remover
@@ -189,45 +176,44 @@ uint8_t ui8AddTask(task_t* tpTask, pfunc_t pfFunction, const char* cpTaskName, v
   \return Returns ERROR_TASK_NOT_REMOVED or TASK_REMOVED.
 */
 uint8_t ui8RemoveTask(task_t* tpTask){
-  if (tpTask->ui8Status == NOT_INSTALLED){
-    return ERROR_TASK_NOT_REMOVED;
-  }
-  else if (tpTask->ui8Status == PRIORIZED){
-    ui16AmountOfPriorizedTasks--;
-  }
-  tpTask->ui8Status = NOT_INSTALLED;
+  uint8_t ui8BufferSchedulerStatus = ui8SchedulerStatus;
+  ui8SchedulerStatus = STOP_SCHEDULER;
   uint8_t ui8Priority = tpTask->ui8Priority;
   uint8_t ui8TaskAddress = tpTask->ui8TaskAddress;
   uint8_t ui8Counter = 0;
-  if(tpTaskArray[ui8Priority][ui8TaskAddress] != tpTask){
+  if (tpTask->ui8Status == NOT_INSTALLED){
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return ERROR_TASK_NOT_REMOVED;
   }
-  tpTaskArray[ui8Priority][ui8TaskAddress] = NULL;
-  faTaskArguments[ui8Priority][ui8TaskAddress] = NULL;
-  ui16TaskArrayTimer[ui8Priority][ui8TaskAddress] = 0;
-  if (ui8NumberOfTasks[ui8Priority] > 1){
-    for (ui8Counter = ui8TaskAddress ; ui8Counter < ui8NumberOfTasks[ui8Priority] ; ui8Counter++){
-      tpTaskArray[ui8Priority][ui8Counter] = tpTaskArray[ui8Priority][ui8Counter + 1];
-      faTaskArguments[ui8Priority][ui8Counter] = faTaskArguments[ui8Priority][ui8Counter + 1];
-      ui16TaskArrayTimer[ui8Priority][ui8Counter] = ui16TaskArrayTimer[ui8Priority][ui8Counter + 1];
-      tpTaskArray[ui8Priority][ui8Counter]->ui8TaskAddress--;
-    }
-    if (ui8Counter == ui8NumberOfTasks[ui8Priority]){
-      tpTaskArray[ui8Priority][ui8Counter - 1] = NULL;
-      faTaskArguments[ui8Priority][ui8Counter - 1] = NULL;
-      ui16TaskArrayTimer[ui8Priority][ui8Counter - 1] = 0;
-    }
+  else if (tpTask->ui8Status == PRIORIZED && ui8DepriveTask(tpTask) != TASK_DEPRIVED){
+    return ERROR_TASK_NOT_REMOVED;
   }
-  ui8NumberOfTasks[tpTask->ui8Priority]--;
+  if(tpTaskArray[ui8Priority][ui8TaskAddress] != tpTask){
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
+    return ERROR_TASK_NOT_REMOVED;
+  }
+  tpTask->ui8Status = NOT_INSTALLED;
+  for (ui8Counter = tpTask->ui8TaskAddress ; (tpTask->ui8TaskAddress != ui8AmountOfTasks[ui8Priority] - 1) && (ui8Counter <= (ui8AmountOfTasks[ui8Priority] - 2)) ; ui8Counter++){
+    tpTaskArray[ui8Priority][ui8Counter] = tpTaskArray[ui8Priority][ui8Counter + 1];
+    faTaskArguments[ui8Priority][ui8Counter] = faTaskArguments[ui8Priority][ui8Counter + 1];
+    ui16TaskArrayTimer[ui8Priority][ui8Counter] = ui16TaskArrayTimer[ui8Priority][ui8Counter + 1];
+    tpTaskArray[ui8Priority][ui8Counter + 1]->ui8TaskAddress--;
+  }
+  tpTaskArray[ui8Priority][ui8Counter] = NULL;
+  faTaskArguments[ui8Priority][ui8Counter] = NULL;
+  ui16TaskArrayTimer[ui8Priority][ui8Counter] = 0;
+  ui8AmountOfTasks[ui8Priority]--;
   if (tpTask->ui8Priority == ui8LastPriority){
     for (ui8Counter = ui8LastPriority ; ui8Counter > 0 ; ui8Counter--){
-      if (ui8NumberOfTasks[ui8Counter] > 0){
+      if (ui8AmountOfTasks[ui8Counter] > 0){
         ui8LastPriority = ui8Counter;
+        ui8SchedulerStatus = ui8BufferSchedulerStatus;
         return TASK_REMOVED;
       }
     }
   }
   ui8LastPriority = 0;
+  ui8SchedulerStatus = ui8BufferSchedulerStatus;
   return TASK_REMOVED;
 }
 
@@ -238,12 +224,16 @@ uint8_t ui8RemoveTask(task_t* tpTask){
   \return Returns ERROR_TASK_NOT_ENABLED or TASK_ENABLED.
 */
 uint8_t ui8EnableTask(task_t* tpTask){
+  uint8_t ui8BufferSchedulerStatus = ui8SchedulerStatus;
+  ui8SchedulerStatus = STOP_SCHEDULER;
   if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
     tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress]->ui8Status = ENABLED;
     ui16TaskArrayTimer[tpTask->ui8Priority][tpTask->ui8TaskAddress] = tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress]->ui16Period;
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return TASK_ENABLED;
   }
   else{
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return ERROR_TASK_NOT_ENABLED;
   }
 }
@@ -255,11 +245,15 @@ uint8_t ui8EnableTask(task_t* tpTask){
   \return Returns ERROR_TASK_NOT_DISABLED or TASK_DISABLED.
 */
 uint8_t ui8DisableTask(task_t* tpTask){
+  uint8_t ui8BufferSchedulerStatus = ui8SchedulerStatus;
+  ui8SchedulerStatus = STOP_SCHEDULER;
   if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
     tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress]->ui8Status = DISABLED;
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return TASK_DISABLED;
   }
   else{
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return ERROR_TASK_NOT_DISABLED;
   }
 }
@@ -271,11 +265,15 @@ uint8_t ui8DisableTask(task_t* tpTask){
   \return Returns TASK_TIMER_RESTARTED or TASK_TIMER_NOT_RESTARTED.
 */
 uint8_t ui8RestartTimerTask(task_t* tpTask){
+  uint8_t ui8BufferSchedulerStatus = ui8SchedulerStatus;
+  ui8SchedulerStatus = STOP_SCHEDULER;
   if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
     ui16TaskArrayTimer[tpTask->ui8Priority][tpTask->ui8TaskAddress] = tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress]->ui16Period;
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return TASK_TIMER_RESTARTED;
   }
   else{
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return TASK_TIMER_NOT_RESTARTED;
   }
 }
@@ -288,17 +286,21 @@ uint8_t ui8RestartTimerTask(task_t* tpTask){
   \return Returns ERROR_TASK_PERIOD_NOT_CHANGED or TASK_PERIOD_CHANGED.
 */
 uint8_t ui8ChangeTaskPeriod(task_t* tpTask, uint16_t ui16Period){
+  uint8_t ui8BufferSchedulerStatus = ui8SchedulerStatus;
+  ui8SchedulerStatus = STOP_SCHEDULER;
   uint8_t ui8TaskCounter = 0;
   if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
     ui16TaskArrayTimer[tpTask->ui8Priority][tpTask->ui8TaskAddress] = ui16Period;
-    for (ui8TaskCounter = 0 ; ui8TaskCounter < NUMBER_OF_TASK_SCHEDULED ; ui8TaskCounter++){
+    for (ui8TaskCounter = 0 ; ui8TaskCounter < AMOUNT_OF_TASK_SCHEDULED ; ui8TaskCounter++){
       if (*tppScheduledTasksVector[ui8TaskCounter] == tpTask){
         tppScheduledTasksVector[ui8TaskCounter] = NULL;
       }
     }
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return TASK_PERIOD_CHANGED;
   }
   else{
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return ERROR_TASK_PERIOD_NOT_CHANGED;
   }
 }
@@ -310,11 +312,15 @@ uint8_t ui8ChangeTaskPeriod(task_t* tpTask, uint16_t ui16Period){
   \return Returns ERROR_TASK_PERIOD_NOT_CHANGED or TASK_PERIOD_CHANGED.
 */
 uint8_t ui8RestoreTaskPeriod(task_t* tpTask){
+  uint8_t ui8BufferSchedulerStatus = ui8SchedulerStatus;
+  ui8SchedulerStatus = STOP_SCHEDULER;
   if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
     ui16TaskArrayTimer[tpTask->ui8Priority][tpTask->ui8TaskAddress] = tpTask->ui16Period;
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return TASK_PERIOD_CHANGED;
   }
   else{
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return ERROR_TASK_PERIOD_NOT_CHANGED;
   }
 }
@@ -326,12 +332,31 @@ uint8_t ui8RestoreTaskPeriod(task_t* tpTask){
   \return Returns ERROR_TASK_NOT_PRIORIZED or TASK_PRIORIZED.
 */
 uint8_t ui8PriorizeTask(task_t* tpTask){
-  if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
-    tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress]->ui8Status = PRIORIZED;
+  uint8_t ui8BufferSchedulerStatus = ui8SchedulerStatus;
+  ui8SchedulerStatus = STOP_SCHEDULER;
+  uint8_t ui8TaskCounter = 0;
+  if (tpTask->ui8Status != ENABLED){
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
+    return ERROR_TASK_NOT_PRIORIZED;
+  }
+  if (tpTask->ui8Status == PRIORIZED){
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
+    return TASK_PRIORIZED;
+  }
+  if(ui16AmountOfPriorizedTasks < AMOUNT_OF_PRIORIZED_TASKS){
+    tpTask->ui8Status = PRIORIZED;
+    tpPriorizedTaskVector[ui16AmountOfPriorizedTasks] = tpTask;
     ui16AmountOfPriorizedTasks++;
+    for (ui8TaskCounter = 0 ; ui8TaskCounter < AMOUNT_OF_TASK_SCHEDULED ; ui8TaskCounter++){
+      if (*tppScheduledTasksVector[ui8TaskCounter] == tpTask){
+        tppScheduledTasksVector[ui8TaskCounter] = NULL;
+      }
+    }
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return TASK_PRIORIZED;
   }
   else{
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return ERROR_TASK_NOT_PRIORIZED;
   }
 }
@@ -340,16 +365,40 @@ uint8_t ui8PriorizeTask(task_t* tpTask){
 /*!
   Deprive a task on task manager.
   \param tpTask is a task_t pointer type.
-  \return Returns ERROR_TASK_NOT_PRIORIZED or TASK_PRIORIZED.
+  \return Returns ERROR_TASK_NOT_DEPRIVED or TASK_DEPRIVED.
 */
 uint8_t ui8DepriveTask(task_t* tpTask){
-  if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
-    tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress]->ui8Status = ENABLED;
-    ui16AmountOfPriorizedTasks--;
-    return TASK_PRIORIZED;
+  uint8_t ui8BufferSchedulerStatus = ui8SchedulerStatus;
+  ui8SchedulerStatus = STOP_SCHEDULER;
+  uint16_t ui16Counter = 0;
+  uint8_t ui8TaskCounter = 0;
+  if (tpTask->ui8Status != PRIORIZED){
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
+    return ERROR_TASK_NOT_DEPRIVED;
+  }
+  for (ui16Counter = 0 ; ui16Counter < AMOUNT_OF_PRIORIZED_TASKS ; ui16Counter++){
+    if(tpPriorizedTaskVector[ui16Counter] == tpTask){
+      tpPriorizedTaskVector[ui16Counter] = NULL;
+      tpTask->ui8Status = ENABLED;
+      ui16AmountOfPriorizedTasks--;
+      for (ui8TaskCounter = 0 ; ui8TaskCounter < AMOUNT_OF_TASK_SCHEDULED ; ui8TaskCounter++){
+        if (*tppScheduledTasksVector[ui8TaskCounter] == tpTask){
+          tppScheduledTasksVector[ui8TaskCounter] = NULL;
+        }
+      }
+    }
+    if (tpTask->ui8Status == ENABLED && ui16Counter < (AMOUNT_OF_PRIORIZED_TASKS - 1)){
+      tpPriorizedTaskVector[ui16Counter] = tpPriorizedTaskVector[ui16Counter + 1];
+      tpPriorizedTaskVector[ui16Counter + 1] = NULL;
+    }
+  }
+  if (tpTask->ui8Status == ENABLED){
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
+    return TASK_DEPRIVED;
   }
   else{
-    return ERROR_TASK_NOT_PRIORIZED;
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
+    return ERROR_TASK_NOT_DEPRIVED;
   }
 }
 
@@ -361,11 +410,15 @@ uint8_t ui8DepriveTask(task_t* tpTask){
   \return Returns ERROR_TASK_ARGUMENT_NOT_CHANGED or TASK_ARGUMENT_CHANGED.
 */
 uint8_t ui8ChangeTaskArgument(task_t* tpTask, void* vpArgument){
+  uint8_t ui8BufferSchedulerStatus = ui8SchedulerStatus;
+  ui8SchedulerStatus = STOP_SCHEDULER;
   if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
     faTaskArguments[tpTask->ui8Priority][tpTask->ui8TaskAddress] = vpArgument;
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return TASK_ARGUMENT_CHANGED;
   }
   else{
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return ERROR_TASK_ARGUMENT_NOT_CHANGED;
   }
 }
@@ -387,17 +440,21 @@ task_t* tpGetCurrentTask(){
   \return Returns the pointer of task or NULL if the task don't exist.
 */
 task_t* tpFindTask(const char* cpTaskName){
+  uint8_t ui8BufferSchedulerStatus = ui8SchedulerStatus;
+  ui8SchedulerStatus = STOP_SCHEDULER;
   if (cpTaskName != NULL){
     uint8_t ui8PriorityCounter = 0;
     uint8_t ui8TaskCounter = 0;
     for (ui8PriorityCounter = 0 ; ui8PriorityCounter < ui8LastPriority ; ui8PriorityCounter++){
       for(ui8TaskCounter = 0 ; tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL ; ui8TaskCounter++){
         if (strcmp(tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->cpTaskName, cpTaskName) == 0){
+          ui8SchedulerStatus = ui8BufferSchedulerStatus;
           return (task_t*) tpTaskArray[ui8PriorityCounter][ui8TaskCounter];
         }
       }
     }
   }
+  ui8SchedulerStatus = ui8BufferSchedulerStatus;
   return NULL;
 }
 
@@ -408,63 +465,14 @@ task_t* tpFindTask(const char* cpTaskName){
   \return Returns the pointer of argument task or NULL if the task don't exist.
 */
 void* vpGetArguments(task_t* tpTask){
+  uint8_t ui8BufferSchedulerStatus = ui8SchedulerStatus;
+  ui8SchedulerStatus = STOP_SCHEDULER;
   if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
+    ui8SchedulerStatus = ui8BufferSchedulerStatus;
     return faTaskArguments[tpTask->ui8Priority][tpTask->ui8TaskAddress];
   }
+  ui8SchedulerStatus = ui8BufferSchedulerStatus;
   return NULL;
-}
-
-// Function: Task Scheduler Updater
-/*!
-  This function is responsible for task scheduler updating.
-*/
-void vTaskSchedulerUpdate(uint8_t ui8RequiredStatus, uint8_t ui8Decrement){
-  uint8_t ui8PriorityCounter = 0;
-  uint8_t ui8TaskCounter = 0;
-  uint16_t ui16ProcessedPriorizedTasks = 0;
-  if (ui16AmountOfPriorizedTasks == 0 && ui8RequiredStatus == PRIORIZED){
-    return;
-  }
-  for (ui8PriorityCounter = 0 ; ui8PriorityCounter <= ui8LastPriority ; ui8PriorityCounter++){
-    for (ui8TaskCounter = 0 ; tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL ; ui8TaskCounter++){
-      if (tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL){
-        if(ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] == 0){
-          if (ui8GetAmountOfPendingData(bpScheduledTasks) < NUMBER_OF_TASK_SCHEDULED && tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL && tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status == ui8RequiredStatus){
-            ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] = tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui16Period;
-            task_t* tpBuffer = (task_t*) tpTaskArray[ui8PriorityCounter][ui8TaskCounter];
-            vPushBufferData(bpScheduledTasks, &tpBuffer);
-            faScheduledTasksArguments[ui8GetWritePosition(bpScheduledTasks)] = faTaskArguments[ui8PriorityCounter][ui8TaskCounter];
-            if (tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status == PRIORIZED && ui8RequiredStatus == PRIORIZED){
-              if (ui16AmountOfPriorizedTasks > ui16ProcessedPriorizedTasks){
-                ui16ProcessedPriorizedTasks++;
-              }
-              else{
-                return;
-              }
-            }
-          }
-        }
-        else{
-          if (tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status == ui8RequiredStatus){
-            if (ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] >= ui8Decrement){
-              ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] -= ui8Decrement;
-            }
-            else{
-              ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] = 0;
-            }
-            if (tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status == PRIORIZED && ui8RequiredStatus == PRIORIZED){
-              if (ui16AmountOfPriorizedTasks > ui16ProcessedPriorizedTasks){
-                ui16ProcessedPriorizedTasks++;
-              }
-              else{
-                return;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
 }
 
 //! Function: Scheduler Interrupt
@@ -473,12 +481,58 @@ void vTaskSchedulerUpdate(uint8_t ui8RequiredStatus, uint8_t ui8Decrement){
 */
 void vSchedulerInterrupt(){
   vSystemWakeUp();
+  if (ui8SchedulerStatus == STOP_SCHEDULER){
+    return;
+  }
+  static uint8_t ui8PriorityCounter = 0;
+  static uint8_t ui8TaskCounter = 0;
+  static uint16_t ui16PriorizedTaskCounter = 0;
   ui16SystemTimer++;
   if (ui16SystemTimer == SOFTWARE_WATCHDOG_TIME && ui8SchedulerStatus == RUNNING_TASK){
     vSystemRestart();
   }
-  vTaskSchedulerUpdate(PRIORIZED, (ui8TickMS << 2));
-  vTaskSchedulerUpdate(ENABLED, ui8TickMS);
+  for (ui16PriorizedTaskCounter = 0 ; tpPriorizedTaskVector[ui16PriorizedTaskCounter] != NULL ; ui16PriorizedTaskCounter++){
+    ui8PriorityCounter = tpPriorizedTaskVector[ui16PriorizedTaskCounter]->ui8Priority;
+    ui8TaskCounter = tpPriorizedTaskVector[ui16PriorizedTaskCounter]->ui8TaskAddress;
+    if(ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] == 0){
+      if(ui8GetAmountOfPendingData(bpScheduledTasks) < AMOUNT_OF_TASK_SCHEDULED){
+        ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] = tpPriorizedTaskVector[ui16PriorizedTaskCounter]->ui16Period;
+        task_t* tpBuffer = (task_t*) tpPriorizedTaskVector[ui16PriorizedTaskCounter];
+        vPushBufferData(bpScheduledTasks, &tpBuffer);
+        faScheduledTasksArguments[ui8GetWritePosition(bpScheduledTasks)] = faTaskArguments[ui8PriorityCounter][ui8TaskCounter];
+      }
+    }
+    else{
+      if (ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] > (ui8TickMS << 2)){
+        ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] -= (ui8TickMS << 2);
+      }
+      else{
+        ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] = 0;
+      }
+    }
+  }
+  for (ui8PriorityCounter = 0 ; ui8PriorityCounter <= ui8LastPriority ; ui8PriorityCounter++){
+    for (ui8TaskCounter = 0 ; tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL ; ui8TaskCounter++){
+      if (tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status == ENABLED){
+        if(ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] == 0){
+          if (ui8GetAmountOfPendingData(bpScheduledTasks) < AMOUNT_OF_TASK_SCHEDULED && tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL){
+            ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] = tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui16Period;
+            task_t* tpBuffer = (task_t*) tpTaskArray[ui8PriorityCounter][ui8TaskCounter];
+            vPushBufferData(bpScheduledTasks, &tpBuffer);
+            faScheduledTasksArguments[ui8GetWritePosition(bpScheduledTasks)] = faTaskArguments[ui8PriorityCounter][ui8TaskCounter];
+          }
+        }
+        else{
+          if (ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] > ui8TickMS){
+            ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] -= ui8TickMS;
+          }
+          else{
+            ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] = 0;
+          }
+        }
+      }
+    }
+  }
 }
 
 //! Function: Scheduler Starter

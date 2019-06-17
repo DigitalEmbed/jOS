@@ -1,4 +1,5 @@
 #include "Semaphores.h"
+#include "TaskScheduler.h"
 #include "jOS.h"
 #include "Binnary.h"
 

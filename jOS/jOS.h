@@ -45,9 +45,10 @@
   Configure the jOS system task manager here.
 */
 #define   TASK_NAME_SIZE                      12
-#define   NUMBER_OF_PRIORITIES                4
-#define   NUMBER_OF_TASK_IN_A_PRIORITY        4
-#define   NUMBER_OF_TASK_SCHEDULED            20
+#define   AMOUNT_OF_PRIORITIES                3
+#define   AMOUNT_OF_TASK_IN_A_PRIORITY        3
+#define   AMOUNT_OF_TASK_SCHEDULED            20
+#define   AMOUNT_OF_PRIORIZED_TASKS           4
 #define   SOFTWARE_WATCHDOG_TIME              200
 
 //! Configuration: Semaphores Manager
