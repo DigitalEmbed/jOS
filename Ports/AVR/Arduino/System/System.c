@@ -33,24 +33,24 @@
 */
 
 #include "System.h"
-#include "../jOS.h"
-#include "../MemoryManager/Bits/Bits.h"
+#include <jOS.h>
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 
-isr_t isrTimerInterrupt = NULL;
+isr_t isrSchedulerInterruptCallback = NULL;
+isr_t isrSemaphoresInterruptCallback = NULL;
 
 /*!
   This variable is the interrupt time. Do not forget to fill it!
 */
 const uint8_t ui8TickMS = 10;
 
-//! Function: Editable System Timer Interrupt Configuration
+//! Function: Editable System Timer Scheduler Interrupt Configuration
 /*!
   Edit this function to configure interruptions timer.
 */
-void vSystemTimerInterruptConfiguration(isr_t isrSchedulerInterrupt){
+void vSystemTimerSchedulerInterruption(isr_t isrSchedulerInterrupt){
   cli();
   /*!
     TIMER 1 for interrupt frequency 1000 Hz:
@@ -71,14 +71,29 @@ void vSystemTimerInterruptConfiguration(isr_t isrSchedulerInterrupt){
     Enable timer compare interrupt
   */
   vSetBit(TIMSK1, TOIE1);
-  isrTimerInterrupt = isrSchedulerInterrupt;
+  isrSchedulerInterruptCallback = isrSchedulerInterrupt;
   sei();
 }
 
+//! Function: Editable System Timer Semphores Interrupt Configuration
+/*!
+  Edit this function to configure interruptions timer.
+*/
+void vSystemTimerSemaphoresInterruption(isr_t isrSemaphoresInterrupt){
+  isrSemaphoresInterrupt = isrSemaphoresInterruptCallback;
+}
+
+//! Callback: AVR Interruption Callback
+/*!
+  This is the callback interruption for timer1.
+*/
 ISR(TIMER1_OVF_vect){
   TCNT1 = 60535;
-  if (isrTimerInterrupt != NULL){
-    isrTimerInterrupt();
+  if (isrSchedulerInterruptCallback != NULL){
+    isrSchedulerInterruptCallback();
+  }
+  if (isrSemaphoresInterruptCallback != NULL){
+    isrSemaphoresInterruptCallback();
   }
 }
 
