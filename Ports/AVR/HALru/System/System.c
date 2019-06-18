@@ -12,11 +12,11 @@ isr_t isrTimerInterrupt = NULL;
 */
 const uint8_t ui8TickMS = 10;
 
-//! Function: Editable System Timer Interrupt Configuration
+//! Function: Editable System Timer Scheduler Interrupt Configuration
 /*!
   Edit this function to configure interruptions timer.
 */
-void vSystemTimerInterruptConfiguration(isr_t isrSchedulerInterrupt){
+void vSystemTimerSchedulerInterruption(isr_t isrSchedulerInterrupt){
   /*!
     TIMER 2 for interrupt frequency 1000 Hz:
   */
@@ -28,12 +28,26 @@ void vSystemTimerInterruptConfiguration(isr_t isrSchedulerInterrupt){
   vEnableAllInterrupts();
 }
 
+//! Function: Editable System Timer Semphores Interrupt Configuration
+/*!
+  Edit this function to configure interruptions timer.
+*/
+void vSystemTimerSemaphoresInterruption(isr_t isrSemaphoresInterrupt){
+  /*!
+    SUB-TIMER A (TIMER 2) for interrupt frequency 1000 Hz:
+  */
+  vDisableAllInterrupts();
+  vAttachTIMERInterrupt(TIMER_2, SUBTIMER_A, isrSemaphoresInterrupt, NULL);
+  vEnableTIMER(TIMER_2, SUBTIMER_A);
+  vEnableAllInterrupts();
+}
+
 //! Function: Editable System Sleep Configuration
 /*!
   Edit this function to configure sleep mode.
 */
 void vSystemSleepConfiguration(){
-  set_sleep_mode(SLEEP_MODE_PWR_SAVE);
+  set_sleep_mode(SLEEP_MODE_IDLE);
   vDisableAllInterrupts();
   sleep_enable();
   vEnableAllInterrupts();

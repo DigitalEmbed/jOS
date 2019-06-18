@@ -42,26 +42,33 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+//! Macros: Others Definitions
+/*!
+  This macros leave the code more cleaner and understandable.
+*/
+#define     MINIMAL_TIME                        ui8TickMS
+
 //! isr_t typedef.
 /*!
   This typedef is equivalent to a void function pointer with no arguments.
 */
 typedef void(*isr_t)();
 
-extern const uint8_t ui8TickMS;                                             /*!< extern const 8-bit integer type variable. */    
-    
-void vSystemRestart();                                                      /*!< void type function. */
-void vSystemSleep();                                                        /*!< void type function. */
-void vSystemWakeUp();                                                       /*!< void type function. */
-void vSystemTimerInterruptConfiguration(isr_t isrSchedulerInterrupt);       /*!< void type function. */
-void vSystemSleepConfiguration();                                           /*!< void type function. */
-void vSystemHardwareWatchdogConfiguration();                                /*!< void type function. */
-void vSystemSuspendRTOSInterrupts();                                        /*!< void type function. */
-void vSystemResumeRTOSInterrupts();                                         /*!< void type function. */
-void vSystemSuspendAllInterrupts();                                         /*!< void type function. */
-void vSystemResumeAllInterrupts();                                          /*!< void type function. */
-void vSystemRestartTimerInit();                                             /*!< void type function. */
-void vSystemRestartTimerStop();                                             /*!< void type function. */
+extern const uint8_t ui8TickMS;                                                                           /*!< extern const 8-bit integer type variable. */
+
+void vSystemRestart();                                                                                    /*!< void type function. */
+void vSystemSleep();                                                                                      /*!< void type function. */
+void vSystemWakeUp();                                                                                     /*!< void type function. */
+void vSystemTimerSchedulerInterruption(isr_t isrSchedulerInterrupt);                                      /*!< void type function. */
+void vSystemTimerSemaphoresInterruption(isr_t isrSemaphoresInterrupt);                                    /*!< void type function. */
+void vSystemSleepConfiguration();                                                                         /*!< void type function. */
+void vSystemHardwareWatchdogConfiguration();                                                              /*!< void type function. */
+void vSystemSuspendRTOSInterrupts();                                                                      /*!< void type function. */
+void vSystemResumeRTOSInterrupts();                                                                       /*!< void type function. */
+void vSystemSuspendAllInterrupts();                                                                       /*!< void type function. */
+void vSystemResumeAllInterrupts();                                                                        /*!< void type function. */
+void vSystemRestartTimerInit();                                                                           /*!< void type function. */
+void vSystemRestartTimerStop();                                                                           /*!< void type function. */
 
 #ifdef __cplusplus
   }
