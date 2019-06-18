@@ -78,15 +78,16 @@
 typedef struct {
   uint8_t ui8SemaphoreStatus;
   uint8_t ui8SemaphoreType;
-  uint8_t ui8TaskHolderPriority;
-  uint16_t ui16TaskHolderPeriod;
+  uint8_t ui8SemaphoreAddress;
+  uint16_t ui16ResetTime;
   task_t* tpTaskHolder;
   list_t* tlpPendingTasksList;
 } semaphore_t;
 
-uint8_t ui8CreateSemaphore(semaphore_t* smpSemaphore, uint8_t ui8SemaphoreType);                /*!< 8-bits integer type function. */
-uint8_t ui8TakeSemaphore(semaphore_t* smpSemaphore);                                            /*!< 8-bits integer type function. */
-uint8_t ui8ReturnSemaphore(semaphore_t* smpSemaphore);                                          /*!< 8-bits integer type function. */
+void vSemaphoreManagerInit(void);                                                                           /*!< void type function. */
+uint8_t ui8CreateSemaphore(semaphore_t* smpSemaphore, uint8_t ui8SemaphoreType, uint16_t ui16ResetTime);    /*!< 8-bits integer type function. */
+uint8_t ui8TakeSemaphore(semaphore_t* smpSemaphore);                                                        /*!< 8-bits integer type function. */
+uint8_t ui8ReturnSemaphore(semaphore_t* smpSemaphore);                                                      /*!< 8-bits integer type function. */
 
 #ifdef __cplusplus
   }

@@ -49,6 +49,7 @@
 #define   AMOUNT_OF_TASK_IN_A_PRIORITY        3
 #define   AMOUNT_OF_TASK_SCHEDULED            20
 #define   AMOUNT_OF_PRIORIZED_TASKS           4
+#define   AMOUNT_OF_SEMAPHORES                5
 #define   SOFTWARE_WATCHDOG_TIME              200
 
 //! Configuration: Semaphores Manager

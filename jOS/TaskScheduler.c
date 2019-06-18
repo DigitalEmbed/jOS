@@ -80,7 +80,7 @@ volatile uint16_t ui16AmountOfPriorizedTasks = 0;                               
 */
 volatile uint8_t ui8SchedulerStatus = ON_HOLD;                                                        /*!< 8-bit integer type. */
 
-void vSchedulerInterrupt();                                                                           /*!< Void type function. */
+void vSchedulerInterrupt(void);                                                                       /*!< Void type function. */
 void vCheckTaskReturn(uint8_t ui8TaskReturn);                                                         /*!< Void type function. */
 
 //! Function: Task Manager Initializer
@@ -96,7 +96,7 @@ uint8_t ui8TaskManagerInit(){
   if (bpScheduledTasks == NULL){
     return TASK_SCHEDULED_BUFFER_ERROR;
   }
-  vSystemTimerInterruptConfiguration(&vSchedulerInterrupt);
+  vSystemTimerSchedulerInterruption(&vSchedulerInterrupt);
   vSystemSleepConfiguration();
   vSystemHardwareWatchdogConfiguration();
   return TASK_MANAGER_INITIALIZED;
@@ -477,9 +477,9 @@ void* vpGetArguments(task_t* tpTask){
 
 //! Function: Scheduler Interrupt
 /*!
-  This is the task manager: When a timer burst, this function is called. This is the task manager: Tasks that have their time equal to 0 are stored in a FIFO buffer and are scheduled to run.
+  This is the task manager: When a timer burst, this function is called. Tasks that have their time equal to 0 are stored in a FIFO buffer and are scheduled to run.
 */
-void vSchedulerInterrupt(){
+void vSchedulerInterrupt(void){
   vSystemWakeUp();
   if (ui8SchedulerStatus == STOP_SCHEDULER){
     return;
