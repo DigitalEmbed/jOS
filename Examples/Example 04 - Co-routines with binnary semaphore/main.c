@@ -51,7 +51,7 @@ uint8_t ui8Task1(void* vpArgs){
   /*!
     Starting co-routine.
   */
-  coRoutine {
+  CoRoutine {
     /*!
       Waiting for "semaphore".
     */
@@ -77,7 +77,7 @@ uint8_t ui8Task1(void* vpArgs){
   /*!
     Co-routine finalization (Without finalization, your code will not work).
   */
-  } end;
+  } EndCoRoutine;
 }
 
 /*!
@@ -86,14 +86,14 @@ uint8_t ui8Task1(void* vpArgs){
 task_t tTask2;
 uint8_t ui8Task2(void* vpArgs){
   static semaphore_t* smTaskFlag = (semaphore_t*) vpArgs;
-  coRoutine {
+  CoRoutine {
     vWaitFor(ui8TakeSemaphore(smTaskFlag) == TASK_HOLDER);
     printf("%s: Executing A\n", tpGetCurrentTask()->cpTaskName);
     printf("%s: Executing B\n", tpGetCurrentTask()->cpTaskName);
     printf("%s: Executing C\n", tpGetCurrentTask()->cpTaskName);
     ui8ReturnSemaphore(smTaskFlag);
     vTaskYield();
-  } end;
+  } EndCoRoutine;
 }
 
 int main(void){
