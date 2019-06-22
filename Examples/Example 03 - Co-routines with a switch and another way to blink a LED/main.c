@@ -52,7 +52,7 @@ uint8_t ui8Task1(void* vpArgs){
   /*!
     Starting co-routine.
   */
-  coRoutine {
+  CoRoutine {
     /*!
       Waiting for "semaphore".
     */
@@ -102,7 +102,7 @@ uint8_t ui8Task1(void* vpArgs){
   /*!
     Co-routine finalization (Without finalization, your code will not work).
   */
-  } end;
+  } EndCoRoutine;
 }
 
 /*!
@@ -111,7 +111,7 @@ uint8_t ui8Task1(void* vpArgs){
 task_t tTask2;
 uint8_t ui8Task2(void* vpArgs){
   static switch_t* sTaskFlag = (switch_t*) vpArgs;
-  coRoutine {
+  CoRoutine {
     vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_ON_SWITCH);
     printf("%s: Executing A\n", tpGetCurrentTask()->cpTaskName);
     vTurnOffSwitch(*sTaskFlag);
@@ -121,7 +121,7 @@ uint8_t ui8Task2(void* vpArgs){
     vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_ON_SWITCH);
     printf("%s: Executing C\n", tpGetCurrentTask()->cpTaskName);
     vTurnOffSwitch(*sTaskFlag);
-  } end;
+  } EndCoRoutine;
 }
 
 /*!
@@ -129,8 +129,7 @@ uint8_t ui8Task2(void* vpArgs){
 */
 task_t tBlink;
 uint8_t ui8Blink(void* vpArgs){
-  vStartCoRoutine();
-  while(1){
+  CoRoutine {
     /*!
       Turning on the LED.
     */
@@ -150,8 +149,7 @@ uint8_t ui8Blink(void* vpArgs){
       Task pausing.
     */
     vTaskDelay(1000);
-  }
-  vEndCoRoutine();
+  } EndCoRoutine;
 }
 
 int main(void){
