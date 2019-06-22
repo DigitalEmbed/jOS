@@ -124,7 +124,7 @@ typedef struct {
   uint16_t ui16Line;                            /*!< 16-bit integer type. */
 }task_t;
 
-uint8_t ui8TaskManagerInit();                                                                                                                                         	/*!< 8-bit integer type function. */
+uint8_t ui8TaskManagerInit(void);                                                                                                                                     	/*!< 8-bit integer type function. */
 uint8_t ui8AddTask(task_t* tpTask, pfunc_t pfFunction, const char* cpTaskName, void* vpArguments, uint8_t ui8Priority, uint16_t ui16Period, uint8_t ui8Status);     		/*!< 8-bit integer type function. */
 uint8_t ui8RemoveTask(task_t* tpTask);                                                                                                                                	/*!< 8-bit integer type function. */
 uint8_t ui8EnableTask(task_t* tpTask);                                                                                                                                	/*!< 8-bit integer type function. */
@@ -135,10 +135,12 @@ uint8_t ui8RestartTimerTask(task_t* tpTask);																																				
 uint8_t ui8ChangeTaskPeriod(task_t* tpTask, uint16_t ui16Period);                                                                                                     	/*!< 8-bit integer type function. */
 uint8_t ui8RestoreTaskPeriod(task_t* tpTask);                                                                                                                           /*!< 8-bit integer type function. */
 uint8_t ui8ChangeTaskArgument(task_t* tpTask, void* vpArgument);                                                                                                      	/*!< 8-bit integer type function. */
-task_t* tpGetCurrentTask();                                                                                                                                           	/*!< task_t pointer type function. */
+task_t* tpGetCurrentTask(void);                                                                                                                                       	/*!< task_t pointer type function. */
 task_t* tpFindTask(const char* cpTaskName);                                                                                                                           	/*!< task_t pointer type function. */
 void* vpGetArguments(task_t* tpTask);                                                                                                                                 	/*!< void pointer type function. */
-void vStartScheduler();                                                                                                                                               	/*!< void type function. */
+void vEnableAllTasks(void);                                                                                                                                           	/*!< void type function. */
+void vDisableAllTasks(void);                                                                                                                                           	/*!< void type function. */
+void vStartScheduler(void);                                                                                                                                           	/*!< void type function. */
 
 #ifdef __cplusplus
   }

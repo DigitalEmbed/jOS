@@ -33,8 +33,8 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef coRoutines_H
-#define coRoutines_H
+#ifndef CoRoutines_H
+#define CoRoutines_H
 
 #ifdef __cplusplus
   extern "C" {
@@ -45,11 +45,11 @@
 #define   COUNTER_OVERFLOW            1
 #define   COUNTER_RUNNING             0
 
-#define   coRoutine                   static task_t* tpCurrentTask = tpGetCurrentTask();\
+#define   CoRoutine                   static task_t* tpCurrentTask = tpGetCurrentTask();\
                                       switch(tpCurrentTask->ui16Line){\
                                         case 0:
 
-#define   end                         }\
+#define   EndCoRoutine                }\
                                       tpCurrentTask->ui16Line = 0;\
                                       return TASK_END;
 

@@ -229,7 +229,12 @@ uint8_t ui8EnableTask(task_t* tpTask){
   if(tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress] == tpTask){
     tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress]->ui8Status = ENABLED;
     ui16TaskArrayTimer[tpTask->ui8Priority][tpTask->ui8TaskAddress] = tpTaskArray[tpTask->ui8Priority][tpTask->ui8TaskAddress]->ui16Period;
-    ui8SchedulerStatus = ui8BufferSchedulerStatus;
+    if (ui8BufferSchedulerStatus == STOP_SCHEDULER){
+      ui8SchedulerStatus = ON_HOLD;
+    }
+    else{
+      ui8SchedulerStatus = ui8BufferSchedulerStatus;
+    }
     return TASK_ENABLED;
   }
   else{
@@ -503,7 +508,7 @@ void vSchedulerInterrupt(void){
       }
     }
     else{
-      if (ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] > (ui8TickMS << 2)){
+      if (ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] > (uint8_t) (ui8TickMS << 2)){
         ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] -= (ui8TickMS << 2);
       }
       else{
@@ -558,6 +563,38 @@ void vStartScheduler(){
   }
   else{
     vSystemSleep();
+  }
+}
+
+//! Function: All Tasks Enabler
+/*!
+  Enable all tasks from task manager.
+*/
+void vEnableAllTasks(void){
+  ui8SchedulerStatus = STOP_SCHEDULER;
+  uint8_t ui8PriorityCounter = 0;
+  uint8_t ui8TaskCounter = 0;
+  for (ui8PriorityCounter = 0 ; ui8PriorityCounter < ui8LastPriority ; ui8PriorityCounter++){
+    for(ui8TaskCounter = 0 ; tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL ; ui8TaskCounter++){
+      tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status = ENABLED;
+      ui16TaskArrayTimer[ui8PriorityCounter][ui8TaskCounter] = tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui16Period;
+    }
+  }
+  ui8SchedulerStatus = ON_HOLD;
+}
+
+//! Function: All Tasks Disabler
+/*!
+  Disable all tasks from task manager.
+*/
+void vDisableAllTasks(void){
+  ui8SchedulerStatus = STOP_SCHEDULER;
+  uint8_t ui8PriorityCounter = 0;
+  uint8_t ui8TaskCounter = 0;
+  for (ui8PriorityCounter = 0 ; ui8PriorityCounter < ui8LastPriority ; ui8PriorityCounter++){
+    for(ui8TaskCounter = 0 ; tpTaskArray[ui8PriorityCounter][ui8TaskCounter] != NULL ; ui8TaskCounter++){
+      tpTaskArray[ui8PriorityCounter][ui8TaskCounter]->ui8Status = DISABLED;
+    }
   }
 }
 

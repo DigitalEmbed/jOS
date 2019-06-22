@@ -75,7 +75,7 @@
   Path to jOS system task manager libraries.
 */
 #include "TaskScheduler.h"
-#include "coRoutines.h"
+#include "CoRoutines.h"
 #include "Switch.h"
 #include "Semaphores.h"
 
