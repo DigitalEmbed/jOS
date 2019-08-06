@@ -44,7 +44,7 @@ isr_t isrSemaphoresInterruptCallback = NULL;
 /*!
   This variable is the interrupt time. Do not forget to fill it!
 */
-const uint8_t ui8TickMS = 10;
+const uint8_t ui8TickMS = 20;
 
 //! Function: Editable System Timer Scheduler Interrupt Configuration
 /*!
