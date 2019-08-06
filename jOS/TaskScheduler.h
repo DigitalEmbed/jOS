@@ -103,18 +103,18 @@
 #define     PRIORIZED                           2
 #define     NOT_INSTALLED                       3
 
-//! Type Definition: pfunc_t
+//! Type Definition: task_pfunc_t
 /*!
   This typedef is equivalent to a uint8_t function pointer with pointer void argument.
 */
-typedef uint8_t (*pfunc_t)(void*);
+typedef uint8_t (*task_pfunc_t)(void*);
 
 //! Type Definition: task_t struct.
 /*!
   This struct creates a task.
 */
 typedef struct {
-  pfunc_t pfFunction;                           /*!< Void function pointer type. */
+  task_pfunc_t pfFunction;                      /*!< Void function pointer type. */
   char* cpTaskName;                             /*!< Char pointer type. */
   void* vpArguments;                            /*!< Void pointer type. */
   uint8_t ui8Priority;                          /*!< 8-bit integer type. */
@@ -125,7 +125,7 @@ typedef struct {
 }task_t;
 
 uint8_t ui8TaskManagerInit(void);                                                                                                                                     	/*!< 8-bit integer type function. */
-uint8_t ui8AddTask(task_t* tpTask, pfunc_t pfFunction, const char* cpTaskName, void* vpArguments, uint8_t ui8Priority, uint16_t ui16Period, uint8_t ui8Status);     		/*!< 8-bit integer type function. */
+uint8_t ui8AddTask(task_t* tpTask, task_pfunc_t pfFunction, const char* cpTaskName, void* vpArguments, uint8_t ui8Priority, uint16_t ui16Period, uint8_t ui8Status);    /*!< 8-bit integer type function. */
 uint8_t ui8RemoveTask(task_t* tpTask);                                                                                                                                	/*!< 8-bit integer type function. */
 uint8_t ui8EnableTask(task_t* tpTask);                                                                                                                                	/*!< 8-bit integer type function. */
 uint8_t ui8DisableTask(task_t* tpTask);                                                                                                                               	/*!< 8-bit integer type function. */

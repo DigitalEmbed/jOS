@@ -61,6 +61,10 @@
 
 #define   vTaskDelay(ui16Time)        ui8ChangeTaskPeriod(tpGetCurrentTask(), ui16Time) , tpCurrentTask->ui16Line = __LINE__ ; return TASK_END; case __LINE__: ui8RestoreTaskPeriod(tpGetCurrentTask());
 
+#define   CooperativeMode             {static uint8_t ui8CooperativeModeActived = 0; CoRoutine
+
+#define   EndCooperativeMode          EndCoRoutine; ui8CooperativeModeActived++;}
+
 #ifdef __cplusplus
   }
 #endif

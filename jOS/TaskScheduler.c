@@ -106,7 +106,7 @@ uint8_t ui8TaskManagerInit(){
 /*!
   Insert a task on task manager.
   \param tpTask is a task_t pointer type.
-  \param pfFunction is a pfunc_t type. This is the function of the task.
+  \param pfFunction is a task_pfunc_t type. This is the function of the task.
   \param cpTaskName is a char pointer type. This is the name of task.
   \param vpArguments is a void pointer type. This is the adress of arguments that are used in the task.
   \param ui8Priority is a 8-bit integer type. This is the priority of the task.
@@ -114,7 +114,7 @@ uint8_t ui8TaskManagerInit(){
   \param ui8Status is a 8-bit integer type. Put "ABLE" on this argument case the task is started abled on system start, or "DISABED" in contrary case.
   \return Returns ERROR_TASK_NOT_ADDED, ERROR_PRIORITY_FULL, EXISTING_TASK or TASK_ADDED.
 */
-uint8_t ui8AddTask(task_t* tpTask, pfunc_t pfFunction, const char* cpTaskName, void* vpArguments, uint8_t ui8Priority, uint16_t ui16Period, uint8_t ui8Status){
+uint8_t ui8AddTask(task_t* tpTask, task_pfunc_t pfFunction, const char* cpTaskName, void* vpArguments, uint8_t ui8Priority, uint16_t ui16Period, uint8_t ui8Status){
   uint8_t ui8BufferSchedulerStatus = ui8SchedulerStatus;
   ui8SchedulerStatus = STOP_SCHEDULER;
   if (tpTask == NULL || pfFunction == NULL || ui8Priority >= AMOUNT_OF_PRIORITIES || (ui8Status != ENABLED && ui8Status != DISABLED && ui8Status != PRIORIZED)){
