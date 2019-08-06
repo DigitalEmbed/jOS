@@ -48,19 +48,19 @@
 */
 #define     MINIMAL_TIME                        ui8TickMS
 
-//! isr_t typedef.
+//! task_isr_t typedef.
 /*!
   This typedef is equivalent to a void function pointer with no arguments.
 */
-typedef void(*isr_t)();
+typedef void(*task_isr_t)(void);
 
 extern const uint8_t ui8TickMS;                                                                           /*!< extern const 8-bit integer type variable. */
 
 void vSystemRestart();                                                                                    /*!< void type function. */
 void vSystemSleep();                                                                                      /*!< void type function. */
 void vSystemWakeUp();                                                                                     /*!< void type function. */
-void vSystemTimerSchedulerInterruption(isr_t isrSchedulerInterrupt);                                      /*!< void type function. */
-void vSystemTimerSemaphoresInterruption(isr_t isrSemaphoresInterrupt);                                    /*!< void type function. */
+void vSystemTimerSchedulerInterruption(task_isr_t isrSchedulerInterruptCallback);                         /*!< void type function. */
+void vSystemTimerSemaphoresInterruption(task_isr_t isrSemaphoresInterruptCallback);                       /*!< void type function. */
 void vSystemSleepConfiguration();                                                                         /*!< void type function. */
 void vSystemHardwareWatchdogConfiguration();                                                              /*!< void type function. */
 void vSystemSuspendRTOSInterrupts();                                                                      /*!< void type function. */

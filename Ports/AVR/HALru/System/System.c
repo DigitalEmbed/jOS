@@ -5,25 +5,49 @@
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 
-isr_t isrTimerInterrupt = NULL;
+/*!
+  This variable is the interrupt callbacks!
+*/
+task_isr_t isrSemaphoreFunctionInterrupt = NULL;
+task_isr_t isrSchedulerFunctionInterrupt = NULL;
 
 /*!
   This variable is the interrupt time. Do not forget to fill it!
 */
 const uint8_t ui8TickMS = 10;
 
+//! Function: CallBack Scheduler Interruption
+/*!
+  Converting "void (*pfunc)(void*)" to "void (*pfunc)(void)"
+*/
+void vSchedulerInterruption(void* vpArgs){
+  if (isrSchedulerFunctionInterrupt != NULL){
+    isrSchedulerFunctionInterrupt();
+  }
+}
+
+//! Function: CallBack Semaphore Interruption
+/*!
+  Converting "void (*pfunc)(void*)" to "void (*pfunc)(void)"
+*/
+void vSemaphoreInterruption(void* vpArgs){
+  if (isrSchedulerFunctionInterrupt != NULL){
+    isrSemaphoreFunctionInterrupt();
+  }
+}
+
 //! Function: Editable System Timer Scheduler Interrupt Configuration
 /*!
   Edit this function to configure interruptions timer.
 */
-void vSystemTimerSchedulerInterruption(isr_t isrSchedulerInterrupt){
+void vSystemTimerSchedulerInterruption(task_isr_t isrSchedulerInterruptCallback){
   /*!
     TIMER 2 for interrupt frequency 1000 Hz:
   */
-  vDisableAllInterrupts();
   vTIMERInit(TIMER_2);
   vSetTIMERPeriodMS(TIMER_2, ui8TickMS);
-  vAttachTIMERInterrupt(TIMER_2, MASTER_TIMER, isrSchedulerInterrupt, NULL);
+  isrSchedulerFunctionInterrupt = isrSchedulerInterruptCallback;
+  vAttachTIMERInterrupt(TIMER_2, MASTER_TIMER, vSchedulerInterruption, NULL);
   vEnableTIMER(TIMER_2, MASTER_TIMER);
   vEnableAllInterrupts();
 }
@@ -32,14 +56,13 @@ void vSystemTimerSchedulerInterruption(isr_t isrSchedulerInterrupt){
 /*!
   Edit this function to configure interruptions timer.
 */
-void vSystemTimerSemaphoresInterruption(isr_t isrSemaphoresInterrupt){
+void vSystemTimerSemaphoresInterruption(task_isr_t isrSemaphoresInterruptCallback){
   /*!
     SUB-TIMER A (TIMER 2) for interrupt frequency 1000 Hz:
   */
-  vDisableAllInterrupts();
-  vAttachTIMERInterrupt(TIMER_2, SUBTIMER_A, isrSemaphoresInterrupt, NULL);
+  isrSemaphoreFunctionInterrupt = isrSemaphoresInterruptCallback;
+  vAttachTIMERInterrupt(TIMER_2, SUBTIMER_A, vSemaphoreInterruption, NULL);
   vEnableTIMER(TIMER_2, SUBTIMER_A);
-  vEnableAllInterrupts();
 }
 
 //! Function: Editable System Sleep Configuration
