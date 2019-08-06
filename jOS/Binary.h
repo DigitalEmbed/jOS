@@ -33,12 +33,12 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Binnary_H
-#define Binnary_H
+#ifndef Binary_H
+#define Binary_H
 
 #include "Semaphores.h"
 
-uint8_t ui8TakeBinnarySemaphore(semaphore_t* smpSemaphore);                     /*!< 8-bit integer type function. */
-uint8_t ui8ReturnBinnarySemaphore(semaphore_t* smpSemaphore);                   /*!< 8-bit integer type function. */
+uint8_t ui8TakeBinarySemaphore(semaphore_t* smpSemaphore);                     /*!< 8-bit integer type function. */
+uint8_t ui8ReturnBinarySemaphore(semaphore_t* smpSemaphore);                   /*!< 8-bit integer type function. */
 
 #endif

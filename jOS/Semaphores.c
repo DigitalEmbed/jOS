@@ -1,7 +1,7 @@
 #include "Semaphores.h"
 #include "TaskScheduler.h"
 #include "jOS.h"
-#include "Binnary.h"
+#include "Binary.h"
 #include "System.h"
 
 uint16_t ui16pResetTime[AMOUNT_OF_SEMAPHORES] = {0};                            /*!< 16-bit integer type. */
@@ -58,7 +58,7 @@ uint8_t ui8CreateSemaphore(semaphore_t* smpSemaphore, uint8_t ui8SemaphoreType, 
   smpSemaphore->ui8SemaphoreAddress = ui8AmountOfSemaphores;
   smpSemaphoresVector[ui8AmountOfSemaphores] = smpSemaphore;
   ui8AmountOfSemaphores++;
-  if (smpSemaphore->ui8SemaphoreType != BINNARY){
+  if (smpSemaphore->ui8SemaphoreType != BINARY){
     smpSemaphore->tlpPendingTasksList = lpCreateTypedList(sizeof(void*));
     if (smpSemaphore->tlpPendingTasksList == NULL){
       return NO_SUCH_MEMORY_FOR_SEMAPHORE;
@@ -76,8 +76,8 @@ uint8_t ui8CreateSemaphore(semaphore_t* smpSemaphore, uint8_t ui8SemaphoreType, 
 uint8_t ui8TakeSemaphore(semaphore_t* smpSemaphore){
   if (smpSemaphore != NULL){
     switch (smpSemaphore->ui8SemaphoreType){
-      case BINNARY:
-        return ui8TakeBinnarySemaphore(smpSemaphore);
+      case BINARY:
+        return ui8TakeBinarySemaphore(smpSemaphore);
       case COUNTING:
         return SEMAPHORE_NOT_INITIALIZED;
       case MUTEX:
@@ -98,8 +98,8 @@ uint8_t ui8TakeSemaphore(semaphore_t* smpSemaphore){
 uint8_t ui8ReturnSemaphore(semaphore_t* smpSemaphore){
   if (smpSemaphore != NULL){
     switch (smpSemaphore->ui8SemaphoreType){
-      case BINNARY:
-        return ui8ReturnBinnarySemaphore(smpSemaphore);
+      case BINARY:
+        return ui8ReturnBinarySemaphore(smpSemaphore);
       case COUNTING:
         return SEMAPHORE_NOT_INITIALIZED;
       case MUTEX:

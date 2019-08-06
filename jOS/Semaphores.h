@@ -48,7 +48,7 @@
 /*!
   This macros are for facilitate the use of this library.
 */
-#define   BINNARY                           0
+#define   BINARY                            0
 #define   COUNTING                          1
 #define   MUTEX                             2
 
