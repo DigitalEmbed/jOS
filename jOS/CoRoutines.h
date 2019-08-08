@@ -46,24 +46,30 @@
 #define   COUNTER_RUNNING             0
 
 #define   CoRoutine                   static task_t* tpCurrentTask = tpGetCurrentTask();\
+                                      static uint8_t ui8TaskYield = 1;\
+                                      if (ui8TaskYield != 1){\
+                                        return SYSTEM_RESTART;\
+                                      }\
+                                      ui8TaskYield = 0;\
                                       switch(tpCurrentTask->ui16Line){\
                                         case 0:
 
 #define   EndCoRoutine                }\
+                                      ui8TaskYield = 1;\
                                       tpCurrentTask->ui16Line = 0;\
                                       return TASK_END;
 
-#define   vTaskYield()                tpCurrentTask->ui16Line = __LINE__ ; return TASK_END ; case __LINE__:
+#define   vTaskYield()                tpCurrentTask->ui16Line = __LINE__ ; ui8TaskYield = 1 ; return TASK_END ; case __LINE__: ui8TaskYield = 0;
 
-#define   vWaitUntil(xCondition)      tpCurrentTask->ui16Line = __LINE__ ; case __LINE__: if ((xCondition)) return TASK_END;
+#define   vWaitUntil(xCondition)      tpCurrentTask->ui16Line = __LINE__ ; case __LINE__: if ((xCondition)) {ui8TaskYield = 1 ; return TASK_END;} ui8TaskYield = 0;
 
-#define   vWaitFor(xCondition)        tpCurrentTask->ui16Line = __LINE__ ; case __LINE__: if (!(xCondition)) return TASK_END;
+#define   vWaitFor(xCondition)        tpCurrentTask->ui16Line = __LINE__ ; case __LINE__: if (!(xCondition)) {ui8TaskYield = 1 ; return TASK_END;} ui8TaskYield = 0;
 
-#define   vTaskDelay(ui16Time)        ui8ChangeTaskPeriod(tpGetCurrentTask(), ui16Time) , tpCurrentTask->ui16Line = __LINE__ ; return TASK_END; case __LINE__: ui8RestoreTaskPeriod(tpGetCurrentTask());
+#define   vTaskDelay(ui16Time)        ui8ChangeTaskPeriod(tpGetCurrentTask(), ui16Time) , tpCurrentTask->ui16Line = __LINE__ ; ui8TaskYield = 1 ; return TASK_END; case __LINE__: ui8RestoreTaskPeriod(tpGetCurrentTask()); ui8TaskYield = 0;
 
-#define   CooperativeMode             {static uint8_t ui8CooperativeModeActived = 0; CoRoutine
+#define   CooperativeMode             {CoRoutine
 
-#define   EndCooperativeMode          EndCoRoutine; ui8CooperativeModeActived++;}
+#define   EndCooperativeMode          EndCoRoutine}
 
 #ifdef __cplusplus
   }

@@ -44,19 +44,19 @@
 /*!
   Configure the jOS system task manager here.
 */
-#define   TASK_NAME_SIZE                      12
-#define   AMOUNT_OF_PRIORITIES                3
+#define   TASK_NAME_SIZE                      18
+#define   AMOUNT_OF_PRIORITIES                4
 #define   AMOUNT_OF_TASK_IN_A_PRIORITY        3
 #define   AMOUNT_OF_TASK_SCHEDULED            20
 #define   AMOUNT_OF_PRIORIZED_TASKS           4
-#define   AMOUNT_OF_SEMAPHORES                5
+#define   AMOUNT_OF_SEMAPHORES                3
 #define   SOFTWARE_WATCHDOG_TIME              200
 
 //! Configuration: Semaphores Manager
 /*!
   Configure the jOS system semaphore manager here.
 */
-#define   AMOUNT_OF_SWITCHES                  16
+#define   AMOUNT_OF_SWITCHES                  8
 
 //! Path: EmbeddedTools
 /*!
