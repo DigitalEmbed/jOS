@@ -20,21 +20,21 @@ const uint8_t ui8TickMS = 10;
 /*!
   Converting "void (*pfunc)(void*)" to "void (*pfunc)(void)"
 */
-void vSchedulerInterruption(void* vpArgs){
+void vSchedulerInterruption(void* vpArgs) NestedMode{
   if (isrSchedulerFunctionInterrupt != NULL){
     isrSchedulerFunctionInterrupt();
   }
-}
+} EndNestedMode
 
 //! Function: CallBack Semaphore Interruption
 /*!
   Converting "void (*pfunc)(void*)" to "void (*pfunc)(void)"
 */
-void vSemaphoreInterruption(void* vpArgs){
+void vSemaphoreInterruption(void* vpArgs) NestedMode{
   if (isrSchedulerFunctionInterrupt != NULL){
     isrSemaphoreFunctionInterrupt();
   }
-}
+} EndNestedMode
 
 //! Function: Editable System Timer Scheduler Interrupt Configuration
 /*!
@@ -146,7 +146,7 @@ void vSystemResumeAllInterrupts(){
   In many microcontrollers there is no "automatic watchdog". To work around this, edit this function so that it schedules a system restart for a longer time than the watchdog software.
 */
 void vSystemRestartTimerInit(){
-  wdt_enable(WDTO_500MS);
+  wdt_enable(WDTO_1S);
 }
 
 //! Function: Editable Cancellation System Restart Timer
