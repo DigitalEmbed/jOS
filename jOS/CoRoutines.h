@@ -65,7 +65,7 @@
 
 #define   vWaitFor(xCondition)        tpCurrentTask->ui16Line = __LINE__ ; case __LINE__: if (!(xCondition)) {ui8TaskYield = 1 ; return TASK_END;} ui8TaskYield = 0;
 
-#define   vTaskDelay(ui16Time)        ui8ChangeTaskPeriod(tpGetCurrentTask(), ui16Time) , tpCurrentTask->ui16Line = __LINE__ ; ui8TaskYield = 1 ; return TASK_END; case __LINE__: ui8RestoreTaskPeriod(tpGetCurrentTask()); ui8TaskYield = 0;
+#define   vTaskDelay(ui16Time)        ui8ChangeTaskPeriod(tpGetCurrentTask(), ui16Time > ui8TickMS ? ui16Time - tpGetCurrentTask()->ui16Period : ui8TickMS) , tpCurrentTask->ui16Line = __LINE__ ; ui8TaskYield = 1 ; return TASK_END; case __LINE__: ui8RestoreTaskPeriod(tpGetCurrentTask()); ui8TaskYield = 0;
 
 #define   CooperativeMode             {CoRoutine
 
