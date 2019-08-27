@@ -1,8 +1,6 @@
 #include "System.h"
 #include <jOS.h>
 #include <HALru.h>
-#include <avr/sleep.h>
-#include <avr/interrupt.h>
 #include <avr/wdt.h>
 
 /*!
@@ -48,7 +46,7 @@ void vSystemTimerSchedulerInterruption(task_isr_t isrSchedulerInterruptCallback)
   vSetTIMERPeriodMS(TIMER_2, ui8TickMS);
   isrSchedulerFunctionInterrupt = isrSchedulerInterruptCallback;
   vAttachTIMERInterrupt(TIMER_2, MASTER_TIMER, vSchedulerInterruption, NULL);
-  vEnableTIMER(TIMER_2, MASTER_TIMER);
+  vEnableTIMERInterrupt(TIMER_2, MASTER_TIMER);
   vEnableAllInterrupts();
 }
 
@@ -62,7 +60,7 @@ void vSystemTimerSemaphoresInterruption(task_isr_t isrSemaphoresInterruptCallbac
   */
   isrSemaphoreFunctionInterrupt = isrSemaphoresInterruptCallback;
   vAttachTIMERInterrupt(TIMER_2, SUBTIMER_A, vSemaphoreInterruption, NULL);
-  vEnableTIMER(TIMER_2, SUBTIMER_A);
+  vEnableTIMERInterrupt(TIMER_2, SUBTIMER_A);
 }
 
 //! Function: Editable System Sleep Configuration
@@ -70,10 +68,7 @@ void vSystemTimerSemaphoresInterruption(task_isr_t isrSemaphoresInterruptCallbac
   Edit this function to configure sleep mode.
 */
 void vSystemSleepConfiguration(){
-  set_sleep_mode(SLEEP_MODE_IDLE);
-  vDisableAllInterrupts();
-  sleep_enable();
-  vEnableAllInterrupts();
+  vSetSleepMode(SLEEP_IDLE_MODE);
 }
 
 //! Function: Editable System Restart
@@ -90,8 +85,7 @@ void vSystemRestart(){
   Edit this function to put your microcontroller to sleep. Remember to enable in a mode where timer interrupts are not turned off.
 */
 void vSystemSleep(){
-  sleep_cpu();
-  sleep_enable();
+  vSleepEnable();
 }
 
 //! Function: Editable System Wake Up
@@ -99,7 +93,7 @@ void vSystemSleep(){
   Edit this function to wake up your microcontroller.
 */
 void vSystemWakeUp(){
-  sleep_disable();
+  vSleepDisable();
 }
 
 //! Function: Editable System Hardware Watchdog
@@ -114,7 +108,7 @@ void vSystemHardwareWatchdogConfiguration(){
   Edit this function so that it suspends RTOS interruptios when it is called.
 */
 void vSystemSuspendRTOSInterrupts(){
-  vDisableTIMER(TIMER_2, MASTER_TIMER);
+  vDisableTIMERInterrupt(TIMER_2, MASTER_TIMER);
 }
 
 //! Function: Editable System Resume Interruptions
@@ -122,7 +116,7 @@ void vSystemSuspendRTOSInterrupts(){
   Edit this function so that it resume RTOS interruptios when it is called.
 */
 void vSystemResumeRTOSInterrupts(){
-  vEnableTIMER(TIMER_2, MASTER_TIMER);
+  vEnableTIMERInterrupt(TIMER_2, MASTER_TIMER);
 }
 
 //! Function: Editable System Suspend Interruptions
