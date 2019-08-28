@@ -45,7 +45,8 @@
 #define   COUNTER_OVERFLOW            1
 #define   COUNTER_RUNNING             0
 
-#define   CoRoutine                   static task_t* tpCurrentTask = tpGetCurrentTask();\
+#define   CoRoutine                   static task_t* tpCurrentTask = NULL;\
+                                      tpCurrentTask = tpGetCurrentTask();\
                                       static uint8_t ui8TaskYield = 1;\
                                       if (ui8TaskYield != 1){\
                                         return SYSTEM_RESTART;\
@@ -65,11 +66,16 @@
 
 #define   vWaitFor(xCondition)        tpCurrentTask->ui16Line = __LINE__ ; case __LINE__: if (!(xCondition)) {ui8TaskYield = 1 ; return TASK_END;} ui8TaskYield = 0;
 
-#define   vTaskDelay(ui16Time)        ui8ChangeTaskPeriod(tpGetCurrentTask(), ui16Time > ui8TickMS ? ui16Time - tpGetCurrentTask()->ui16Period : ui8TickMS) , tpCurrentTask->ui16Line = __LINE__ ; ui8TaskYield = 1 ; return TASK_END; case __LINE__: ui8RestoreTaskPeriod(tpGetCurrentTask()); ui8TaskYield = 0;
+#define   vTaskDelay(ui16Time)        ui8ChangeTaskPeriod(tpGetCurrentTask(), ui16Time > ui8TickMS ? (ui16Time > tpGetCurrentTask()->ui16Period ? ui16Time - tpGetCurrentTask()->ui16Period : ui16Time) : ui8TickMS) , tpCurrentTask->ui16Line = __LINE__ ; ui8TaskYield = 1 ; return TASK_END; case __LINE__: ui8RestoreTaskPeriod(tpGetCurrentTask()); ui8TaskYield = 0;
 
 #define   CooperativeMode             {CoRoutine
 
 #define   EndCooperativeMode          EndCoRoutine}
+
+#define   RunOnce                     static uint8_t ui8RunOnce = 0;\
+                                      if (ui8RunOnce == 0)
+
+#define   EndRunOnce                  ui8RunOnce = 1;
 
 #ifdef __cplusplus
   }

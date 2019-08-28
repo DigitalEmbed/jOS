@@ -84,6 +84,9 @@
 #define     ERROR_TASK_NOT_DEPRIVED             22
 #define     NO_SUCH_MEMORY                      106
 
+#define     MINIMAL_TASK_PERIOD                 ui8TickMS
+#define     COOPERATIVE_TASK_PERIOD             ui8TickMS
+
 //! Macros: Task Status
 /*!
   These macros are used in task returns. For each return, the operating system will behave - and this is editable in the vCheckTaskReturn(uint8_t ui8TaskReturn) function.

@@ -45,8 +45,8 @@
   Configure the jOS system task manager here.
 */
 #define   TASK_NAME_SIZE                      18
-#define   AMOUNT_OF_PRIORITIES                4
-#define   AMOUNT_OF_TASK_IN_A_PRIORITY        3
+#define   AMOUNT_OF_PRIORITIES                3
+#define   AMOUNT_OF_TASK_IN_A_PRIORITY        5
 #define   AMOUNT_OF_TASK_SCHEDULED            20
 #define   AMOUNT_OF_PRIORIZED_TASKS           4
 #define   AMOUNT_OF_SEMAPHORES                3

@@ -36,9 +36,17 @@
 #ifndef Binary_H
 #define Binary_H
 
+#ifdef __cplusplus
+  extern "C" {
+#endif
+
 #include "Semaphores.h"
 
 uint8_t ui8TakeBinarySemaphore(semaphore_t* smpSemaphore);                     /*!< 8-bit integer type function. */
 uint8_t ui8ReturnBinarySemaphore(semaphore_t* smpSemaphore);                   /*!< 8-bit integer type function. */
+
+#ifdef __cplusplus
+  }
+#endif
 
 #endif
