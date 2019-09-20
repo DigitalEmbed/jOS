@@ -118,6 +118,32 @@ typedef struct {
   uint16_t ui16TimeCounter;                                                                                                                                                     /*!< 16-bit integer type. */
 } task_handler_t;
 
+//! Macro: Timer Creator
+/*!
+  Create a timer type task_t.
+  \param cpTaskName a char string vector. It's the task name.
+  \param tTaskFunction a void function pointer. It's the task callback.
+  \param vpArguments a void pointer. It's the task callback argument.
+  \param ui16Period is a 16-bit unsigned integer. It's the callback repetition time.
+  \param ui8Priority is a 8-bit unsigned integer. It's the task priority.
+  \param ui8Status is a 8-bit unsigned integer. It's the task start status (ENABLED or DISABLED).
+  \return Returns the task pointer.
+*/
+#define     tCreateTimer(cpTaskName, tTaskFunction, vpArguments, ui16Period, ui8Priority, ui8Status)            tCreateTask(cpTaskName, tTaskFunction, vpArguments, ui16Period, ui8Priority, ui8Status);
+
+
+//! Macro: Thread Creator
+/*!
+  Create a thread type task_t.
+  \param cpTaskName a char string vector. It's the task name.
+  \param tTaskFunction a void function pointer. It's the task callback.
+  \param vpArguments a void pointer. It's the task callback argument.
+  \param ui8Priority is a 8-bit unsigned integer. It's the task priority.
+  \param ui8Status is a 8-bit unsigned integer. It's the task start status (ENABLED or DISABLED).
+  \return Returns the task pointer.
+*/
+#define     tCreateThread(cpTaskName, tTaskFunction, vpArguments, ui8Priority, ui8Status)                       tCreateTask(cpTaskName, tTaskFunction, vpArguments, COOPERATIVE_MODE, ui8Priority, ui8Status);
+
 //! Type Definition: task_t
 /*!
   This typedef exist for organization purpose.
