@@ -1,8 +1,7 @@
-#include "Semaphores.h"
-#include "TaskScheduler.h"
-#include "jOS.h"
-#include "Binary.h"
-#include "System.h"
+#include "./Semaphores.h"
+
+#include "./Binary.h"
+#include <EmbeddedTools.h>
 
 uint16_t ui16pResetTime[AMOUNT_OF_SEMAPHORES] = {0};                            /*!< 16-bit integer type. */
 semaphore_t* smpSemaphoresVector[AMOUNT_OF_SEMAPHORES] = {NULL};                /*!< semaphore_t pointer type. */
@@ -22,7 +21,7 @@ void vSemaphoresInterrupt(void){
   for (ui8Counter = 0 ; smpSemaphoresVector[ui8Counter] != NULL ; ui8Counter++){
     if (smpSemaphoresVector[ui8Counter]->ui8SemaphoreStatus != SEMAPHORE_IDLE){
       if (ui16pResetTime[ui8Counter] < ui8TickMS){
-        vSystemRestart();
+        vRestartSystem();
       }
       else{
         ui16pResetTime[ui8Counter] -= ui8TickMS;
@@ -36,7 +35,7 @@ void vSemaphoresInterrupt(void){
   Initialize the semaphore manager.
 */
 void vSemaphoreManagerInit(void){
-  vSystemTimerSemaphoresInterruption(&vSemaphoresInterrupt);
+  vSemaphoreTimerConfiguration(&vSemaphoresInterrupt);
 }
 
 //! Function: Semaphore Initializer
@@ -52,18 +51,11 @@ uint8_t ui8CreateSemaphore(semaphore_t* smpSemaphore, uint8_t ui8SemaphoreType, 
   }
   smpSemaphore->ui8SemaphoreStatus = SEMAPHORE_IDLE;
   smpSemaphore->ui8SemaphoreType = ui8SemaphoreType;
-  smpSemaphore->tlpPendingTasksList = NULL;
-  smpSemaphore->tpTaskHolder = NULL;
+  smpSemaphore->tTaskHolder = NULL;
   smpSemaphore->ui16ResetTime = ui16ResetTime;
   smpSemaphore->ui8SemaphoreAddress = ui8AmountOfSemaphores;
   smpSemaphoresVector[ui8AmountOfSemaphores] = smpSemaphore;
   ui8AmountOfSemaphores++;
-  if (smpSemaphore->ui8SemaphoreType != BINARY){
-    smpSemaphore->tlpPendingTasksList = lpCreateTypedList(sizeof(void*));
-    if (smpSemaphore->tlpPendingTasksList == NULL){
-      return NO_SUCH_MEMORY_FOR_SEMAPHORE;
-    }
-  }
   return SEMAPHORE_INITIALIZED;
 }
 

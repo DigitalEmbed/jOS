@@ -1,4 +1,4 @@
-#include "Binary.h"
+#include "./Binary.h"
 
 extern uint16_t ui16pResetTime[AMOUNT_OF_SEMAPHORES];
 
@@ -9,12 +9,12 @@ extern uint16_t ui16pResetTime[AMOUNT_OF_SEMAPHORES];
   \return Returns TASK_HOLDER or SEMAPHORE_BUSY.
 */
 uint8_t ui8TakeBinarySemaphore(semaphore_t* smpSemaphore){
-  if (smpSemaphore->tpTaskHolder == NULL){
-    smpSemaphore->tpTaskHolder = tpGetCurrentTask();
+  if (smpSemaphore->tTaskHolder == NULL){
+    smpSemaphore->tTaskHolder = tCurrentTask;
     smpSemaphore->ui8SemaphoreStatus = SEMAPHORE_BUSY;
     ui16pResetTime[smpSemaphore->ui8SemaphoreAddress] = smpSemaphore->ui16ResetTime;
   }
-  if (smpSemaphore->tpTaskHolder == tpGetCurrentTask()){
+  if (smpSemaphore->tTaskHolder == tCurrentTask){
     return TASK_HOLDER;
   }
   return SEMAPHORE_BUSY;
@@ -22,14 +22,14 @@ uint8_t ui8TakeBinarySemaphore(semaphore_t* smpSemaphore){
 
 //! Function: Semaphore Retorner
 /*!
-  Try return a semaphore.
+  Tries return a semaphore.
   \param smpSemaphore is a semaphore_t pointer type.
   \return Returns RETURNED_SEMAPHORE or SEMAPHORE_BUSY.
 */
 uint8_t ui8ReturnBinarySemaphore(semaphore_t* smpSemaphore){
-  if (smpSemaphore->tpTaskHolder == tpGetCurrentTask()){
+  if (smpSemaphore->tTaskHolder == tCurrentTask){
     smpSemaphore->ui8SemaphoreStatus = SEMAPHORE_IDLE;
-    smpSemaphore->tpTaskHolder = NULL;
+    smpSemaphore->tTaskHolder = NULL;
     ui16pResetTime[smpSemaphore->ui8SemaphoreAddress] = smpSemaphore->ui16ResetTime;
     return RETURNED_SEMAPHORE;
   }

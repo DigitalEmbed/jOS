@@ -1,4 +1,4 @@
-//! jOS Version 1.0b
+//! jOS Version 2.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -40,33 +40,44 @@
   extern "C" {
 #endif
 
-#include "TaskScheduler.h"
+#include "./TaskScheduler.h"
 
 #define   COUNTER_OVERFLOW            1
 #define   COUNTER_RUNNING             0
 
-#define   CoRoutine                   static task_t* tpCurrentTask = NULL;\
-                                      tpCurrentTask = tpGetCurrentTask();\
-                                      static uint8_t ui8TaskYield = 1;\
+#define   CoRoutine                   static uint8_t ui8TaskYield = 1;\
+                                      static uint16_t ui16TaskPeriodBackup = 0;\
+                                      ui16TaskPeriodBackup = 0;\
                                       if (ui8TaskYield != 1){\
-                                        return SYSTEM_RESTART;\
+                                        return RESTART;\
                                       }\
                                       ui8TaskYield = 0;\
-                                      switch(tpCurrentTask->ui16Line){\
+                                      switch(tCurrentTask->ui16Line){\
                                         case 0:
 
 #define   EndCoRoutine                }\
                                       ui8TaskYield = 1;\
-                                      tpCurrentTask->ui16Line = 0;\
-                                      return TASK_END;
+                                      tCurrentTask->ui16Line = 0;\
+                                      if (ui16TaskPeriodBackup != 0){\
+                                        tCurrentTask->ui16TimeCounter = tCurrentTask->ui16Period;\
+                                      }\
+                                      return END;
 
-#define   vTaskYield()                tpCurrentTask->ui16Line = __LINE__ ; ui8TaskYield = 1 ; return TASK_END ; case __LINE__: ui8TaskYield = 0;
+#define   vTaskYield()                tCurrentTask->ui16Line = __LINE__ ; ui8TaskYield = 1 ; return END ; case __LINE__: ui8TaskYield = 0;
 
-#define   vWaitUntil(xCondition)      tpCurrentTask->ui16Line = __LINE__ ; case __LINE__: if ((xCondition)) {ui8TaskYield = 1 ; return TASK_END;} ui8TaskYield = 0;
+#define   vWaitUntil(xCondition)      tCurrentTask->ui16Line = __LINE__ ; case __LINE__: if ((xCondition)) {ui8TaskYield = 1 ; return END;} ui8TaskYield = 0;
 
-#define   vWaitFor(xCondition)        tpCurrentTask->ui16Line = __LINE__ ; case __LINE__: if (!(xCondition)) {ui8TaskYield = 1 ; return TASK_END;} ui8TaskYield = 0;
+#define   vWaitFor(xCondition)        tCurrentTask->ui16Line = __LINE__ ; case __LINE__: if (!(xCondition)) {ui8TaskYield = 1 ; return END;} ui8TaskYield = 0;
 
-#define   vTaskDelay(ui16Time)        ui8ChangeTaskPeriod(tpGetCurrentTask(), ui16Time > ui8TickMS ? (ui16Time > tpGetCurrentTask()->ui16Period ? ui16Time - tpGetCurrentTask()->ui16Period : ui16Time) : ui8TickMS) , tpCurrentTask->ui16Line = __LINE__ ; ui8TaskYield = 1 ; return TASK_END; case __LINE__: ui8RestoreTaskPeriod(tpGetCurrentTask()); ui8TaskYield = 0;
+#define   vTaskDelay(ui16Time)        ui16TaskPeriodBackup = tCurrentTask->ui16Period ;\
+                                      if (tCurrentTask->ui8TaskType == COOPERATIVE_THREAD_TYPE && ui16Time > tCurrentTask->ui16Period){\
+                                        vChangeTaskPeriod(NULL, ((ui16Time) < ui8TickMS ? ui8TickMS : (ui16Time - ui8TickMS)));\
+                                      }\
+                                      tCurrentTask->ui16Line = __LINE__ ; ui8TaskYield = 1 ; return END; case __LINE__:\
+                                      if (tCurrentTask->ui8TaskType == COOPERATIVE_THREAD_TYPE && ui16Time > tCurrentTask->ui16Period){\
+                                        vChangeTaskPeriod(NULL, ui16TaskPeriodBackup);\
+                                      }\
+                                      ui8TaskYield = 0;
 
 #define   CooperativeMode             {CoRoutine
 

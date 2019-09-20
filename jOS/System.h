@@ -33,36 +33,26 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Switch_h
-#define Switch_h
+#ifndef System_H
+#define System_H
 
 #ifdef __cplusplus
   extern "C" {
 #endif
 
+#include "./Configs.h"
+#include <stdint.h>
 #include <stdio.h>
-#include <inttypes.h>
 
-//! Macros: Switch Satus
-/*!
-  This macros are for facilitate the use of this library.
-*/
-#define   ERROR_SWITCH_NOT_INITIALIZED      0
-#define   SWITCH_INITIALIZED                1
+extern const uint8_t ui8TickMS;                                                             /*!< extern const 8-bit integer type variable. */
 
-#define   TURNED_OFF_SWITCH                 0
-#define   TURNED_ON_SWITCH                  1
-
-//! Type Definition: switch_t
-/*!
-  This typedef exist for organization purpose. This type is equivalent of a 8-bit unsigned integer.
-*/
-typedef uint8_t switch_t;
-
-uint8_t ui8SwitchInit(switch_t* spSwitch);          /*!< 8-bits integer type function. */
-void vTurnOnSwitch(switch_t* sSwitch);              /*!< 8-bits integer type function. */
-void vTurnOffSwitch(switch_t* sSwitch);             /*!< 8-bits integer type function. */
-uint8_t ui8GetSwitchStatus(switch_t* sSwitch);      /*!< 8-bits integer type function. */
+void vTaskTimerConfiguration(void (*vSchedulerInterruption)(void));                         /*!< void type function. */
+void vSemaphoreTimerConfiguration(void (*vSemaphoresInterruption)(void));                   /*!< void type function. */
+void vSystemSleepConfiguration(void);                                                       /*!< void type function. */
+void vSystemSleep(void);                                                                    /*!< void type function. */
+void vEnableWatchdog(void);                                                                 /*!< void type function. */
+void vDisableWatchdog(void);                                                                /*!< void type function. */
+void vRestartSystem(void);                                                                  /*!< void type function. */
 
 #ifdef __cplusplus
   }

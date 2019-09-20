@@ -1,4 +1,4 @@
-//! jOS Version 1.0b
+//! jOS Version 2.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -40,7 +40,8 @@
   extern "C" {
 #endif
 
-#include "Semaphores.h"
+#include <stdint.h>
+#include "./Semaphores.h"
 
 uint8_t ui8TakeBinarySemaphore(semaphore_t* smpSemaphore);                     /*!< 8-bit integer type function. */
 uint8_t ui8ReturnBinarySemaphore(semaphore_t* smpSemaphore);                   /*!< 8-bit integer type function. */

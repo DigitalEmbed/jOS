@@ -1,5 +1,7 @@
-#include "Switch.h"
-#include "jOS.h"
+#include "./Switch.h"
+
+#include "./Configs.h"
+#include <EmbeddedTools.h>
 
 //! Bit Vector: Switch
 /*!
@@ -29,8 +31,8 @@ uint8_t ui8SwitchInit(switch_t* spSwitch){
   Turn on a Switch.
   \param sSwitch is a switch_t type.
 */
-void vTurnOnSwitch(switch_t sSwitch){
-  vSetBitVector(bvSwitches, sSwitch);
+void vTurnOnSwitch(switch_t* sSwitch){
+  vSetBitVector(bvSwitches, *(sSwitch));
 }
 
 //! Function: Turn Off Switch
@@ -38,8 +40,8 @@ void vTurnOnSwitch(switch_t sSwitch){
   Turn off a Switch.
   \param sSwitch is a switch_t type.
 */
-void vTurnOffSwitch(switch_t sSwitch){
-  vEraseBitVector(bvSwitches, sSwitch);
+void vTurnOffSwitch(switch_t* sSwitch){
+  vEraseBitVector(bvSwitches, *(sSwitch));
 }
 
 //! Function: Switch Status Getter
@@ -48,6 +50,6 @@ void vTurnOffSwitch(switch_t sSwitch){
   \param sSwitch is a switch_t type.
   \return Returns BUSY or NOT_BUSY.
 */
-uint8_t ui8GetSwitchStatus(switch_t sSwitch){
-  return ui8ReadBitVector(bvSwitches, sSwitch);
+uint8_t ui8GetSwitchStatus(switch_t* sSwitch){
+  return ui8ReadBitVector(bvSwitches, *(sSwitch));
 }

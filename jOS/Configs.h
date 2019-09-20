@@ -33,36 +33,36 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Switch_h
-#define Switch_h
+#ifndef jOS_Configs_H
+#define jOS_Configs_H
 
 #ifdef __cplusplus
   extern "C" {
 #endif
 
-#include <stdio.h>
-#include <inttypes.h>
-
-//! Macros: Switch Satus
+//! Configuration: HAL
 /*!
-  This macros are for facilitate the use of this library.
+  Set the hal system here.
+  Availables:
+    - Arduino
+    - HALru
 */
-#define   ERROR_SWITCH_NOT_INITIALIZED      0
-#define   SWITCH_INITIALIZED                1
+#define   HALru
 
-#define   TURNED_OFF_SWITCH                 0
-#define   TURNED_ON_SWITCH                  1
-
-//! Type Definition: switch_t
+//! Configuration: Task Manager
 /*!
-  This typedef exist for organization purpose. This type is equivalent of a 8-bit unsigned integer.
+  Configure the jOS system task manager here.
 */
-typedef uint8_t switch_t;
+#define   AMOUNT_OF_TASKS                     8
+#define   MINIMAL_THREAD_PRIORITY             100
+#define   SIZE_OF_TASK_NAME                   7
 
-uint8_t ui8SwitchInit(switch_t* spSwitch);          /*!< 8-bits integer type function. */
-void vTurnOnSwitch(switch_t* sSwitch);              /*!< 8-bits integer type function. */
-void vTurnOffSwitch(switch_t* sSwitch);             /*!< 8-bits integer type function. */
-uint8_t ui8GetSwitchStatus(switch_t* sSwitch);      /*!< 8-bits integer type function. */
+//! Configuration: Semaphores Manager
+/*!
+  Configure the jOS system semaphore manager here.
+*/
+#define   AMOUNT_OF_SEMAPHORES                3
+#define   AMOUNT_OF_SWITCHES                  8
 
 #ifdef __cplusplus
   }

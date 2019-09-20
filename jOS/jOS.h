@@ -1,4 +1,4 @@
-//! jOS Version 1.0b
+//! jOS Version 2.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -40,23 +40,16 @@
   extern "C" {
 #endif
 
-//! Configuration: Task Manager
-/*!
-  Configure the jOS system task manager here.
-*/
-#define   TASK_NAME_SIZE                      18
-#define   AMOUNT_OF_PRIORITIES                3
-#define   AMOUNT_OF_TASK_IN_A_PRIORITY        5
-#define   AMOUNT_OF_TASK_SCHEDULED            20
-#define   AMOUNT_OF_PRIORIZED_TASKS           4
-#define   AMOUNT_OF_SEMAPHORES                3
-#define   SOFTWARE_WATCHDOG_TIME              200
+#define JOS_ACTIVED
 
-//! Configuration: Semaphores Manager
+//! Standard C Libs
 /*!
-  Configure the jOS system semaphore manager here.
+  Path to standard c libraries.
 */
-#define   AMOUNT_OF_SWITCHES                  8
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 //! Path: EmbeddedTools
 /*!
@@ -68,22 +61,22 @@
 /*!
   Path to jOS system MemoryManager library.
 */
-#include <MemoryManager.h>
+//#include <MemoryManager.h>
 
 //! Path: Tools
 /*!
   Path to jOS system task manager libraries.
 */
-#include "TaskScheduler.h"
-#include "CoRoutines.h"
-#include "Switch.h"
-#include "Semaphores.h"
+#include "./TaskScheduler.h"
+#include "./CoRoutines.h"
+#include "./Switch.h"
+#include "./Semaphores.h"
 
 //! Path: System
 /*!
   Path to jOS system libraries.
 */
-#include "System.h"
+#include "./System.h"
 
 #ifdef __cplusplus
   }

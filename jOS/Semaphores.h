@@ -1,4 +1,4 @@
-//! jOS Version 1.0b
+//! jOS Version 2.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -42,7 +42,8 @@
 
 #include <stdio.h>
 #include <inttypes.h>
-#include "jOS.h"
+#include "./Configs.h"
+#include "./TaskScheduler.h"
 
 //! Macros: Semaphore Satus
 /*!
@@ -73,15 +74,14 @@
 
 //! Type Definition: semaphore_t
 /*!
-  This typedef exist for organization purpose. This type is equivalent of a 8-bit unsigned integer.
+  This typedef exist for organization purpose.
 */
 typedef struct {
   uint8_t ui8SemaphoreStatus;
   uint8_t ui8SemaphoreType;
   uint8_t ui8SemaphoreAddress;
   uint16_t ui16ResetTime;
-  task_t* tpTaskHolder;
-  list_t* tlpPendingTasksList;
+  task_t tTaskHolder;
 } semaphore_t;
 
 void vSemaphoreManagerInit(void);                                                                           /*!< void type function. */
