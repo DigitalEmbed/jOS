@@ -1,10 +1,11 @@
 #include "./System.h"
 
-#if defined(HALru)
+#if defined(ArduinoAVR)
 
-#include <HALru.h>
+#include <avr/sleep.h>
+#include <avr/interrupt.h>
 #include <avr/wdt.h>
-#include <EmbeddedTools.h>
+#include <avr/io.h>
 
 /*!
   This variable is the interrupt time. Do not forget to fill it!
@@ -17,33 +18,46 @@ const uint8_t ui8TickMS = 10;
 void (*vSemaphoresManagerCallBack)(void) = NULL;
 void (*vTaskSchedulerCallBack)(void) = NULL;
 
-//! Function: CallBack Scheduler Interruption
 /*!
-  Converting "void (*pfunc)(void*)" to "void (*pfunc)(void)"
+  Function: CallBack System Interruption
 */
-void vMasterTimerCallback(void* vpArguments) NestedMode {
-  vTaskSchedulerCallBack();
-} EndNestedMode;
-
-//! Function: CallBack Semaphore Interruption
-/*!
-  Converting "void (*pfunc)(void*)" to "void (*pfunc)(void)"
-*/
-void vSubTimerACallback(void* vpArguments) NestedMode {
-  vSemaphoresManagerCallBack();
-} EndNestedMode;
+ISR(TIMER1_OVF_vect){
+  TCNT1 = 60536;
+  if (vTaskSchedulerCallBack != NULL){
+    vTaskSchedulerCallBack();
+  }
+  if (vSemaphoresManagerCallBack != NULL){
+    vSemaphoresManagerCallBack();
+  }
+}
 
 //! Function: Editable System Timer Scheduler Interrupt Configuration
 /*!
   Edit this function to configure interruptions timer.
 */
 void vTaskTimerConfiguration(void (*vSchedulerInterruption)(void)){
-  vTIMERInit(TIMER_2);
-  vSetTIMERPeriodMS(TIMER_2, ui8TickMS);
+  cli();
+  /*!
+    TIMER 1 for interrupt frequency 1000 Hz:
+  */
+  TCCR1A = 0;
+  TCCR1B = 0;
+  /*!
+    Set compare match register for 100 Hz (10ms) increments
+    16000000 / (64 * 100) - 1 (must be <256)
+  */
+  TCNT1 = 63036;
+  /*!
+    Set CS11 and CS10 bits for 64 prescaler
+  */
+  vSetBit(TCCR1B, CS11);
+  vSetBit(TCCR1B, CS10);
+  /*!
+    Enable timer compare interrupt
+  */
+  vSetBit(TIMSK1, TOIE1);
   vTaskSchedulerCallBack = vSchedulerInterruption;
-  vAttachTIMERInterrupt(TIMER_2, MASTER_TIMER, vMasterTimerCallback, NULL);
-  vEnableTIMERInterrupt(TIMER_2, MASTER_TIMER);
-  vEnableAllInterrupts();
+  sei();
 }
 
 //! Function: Editable System Timer Semaphore Interrupt Configuration
@@ -52,8 +66,6 @@ void vTaskTimerConfiguration(void (*vSchedulerInterruption)(void)){
 */
 void vSemaphoreTimerConfiguration(void (*vSemaphoresInterruption)(void)){
   vSemaphoresManagerCallBack = vSemaphoresInterruption;
-  vAttachTIMERInterrupt(TIMER_2, SUBTIMER_A, vSubTimerACallback, NULL);
-  vEnableTIMERInterrupt(TIMER_2, SUBTIMER_A);
 }
 
 //! Function: Editable System Sleep Configuration
@@ -61,7 +73,10 @@ void vSemaphoreTimerConfiguration(void (*vSemaphoresInterruption)(void)){
   Edit this function to configure sleep mode.
 */
 void vSystemSleepConfiguration(void){
-  vSetSleepMode(SLEEP_IDLE_MODE);
+  set_sleep_mode(SLEEP_MODE_IDLE);
+  cli();
+  sleep_enable();
+  sei();
 }
 
 //! Function: Editable System Sleep
@@ -69,23 +84,24 @@ void vSystemSleepConfiguration(void){
   Edit this function to put your microcontroller to sleep. Remember to enable in a mode where timer interrupts are not turned off.
 */
 void vSystemSleep(void){
-  vSleepEnable();
+  sleep_cpu();
+  sleep_enable();
 }
 
-//! Function: Editable System Watchdog Enabler
+//! Function: Editable System Sleep
 /*!
-  Edit this function to enable watchdog of your microcontroller.
+  Edit this function to put your microcontroller to sleep. Remember to enable in a mode where timer interrupts are not turned off.
 */
 void vEnableWatchdog(void){
-  vStartWatchdog(INTERRUPT_RESET_MODE, WHATCHDOG_TIMER_1S);
+  wdt_enable(WDTO_1S);
 }
 
-//! Function: Editable System Watchdog Disabler
+//! Function: Editable System Wake Up
 /*!
-  Edit this function to disable watchdog of your microcontroller.
+  Edit this function to wake up your microcontroller.
 */
 void vDisableWatchdog(void){
-  vStopWatchdog();
+  wdt_disable();
 }
 
 //! Function: Editable System Restart
@@ -93,7 +109,8 @@ void vDisableWatchdog(void){
   Edit this function to restart your microcontroller.
 */
 void vRestartSystem(void){
-  vForceSystemReset(INTERRUPT_RESET_MODE);
+  wdt_enable(WDTO_15MS);
+  while(1);
 }
 
 #endif

@@ -44,7 +44,7 @@
 /*!
   Set the hal system here.
   Availables:
-    - Arduino
+    - ArduinoAVR
     - HALru
 */
 #define   HALru
