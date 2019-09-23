@@ -1,4 +1,4 @@
-//! jOS Version 2.0b
+//! winTerface Version 1.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -33,36 +33,29 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Switch_h
-#define Switch_h
+#ifndef Scheduler_Class_H
+#define Scheduler_Class_H
 
 #ifdef __cplusplus
   extern "C" {
 #endif
 
-#include <stdio.h>
-#include <inttypes.h>
+#include <jOS.h>
+#include <avr/pgmspace.h>
 
-//! Macros: Switch Satus
+//! Type Definition: scheduler_manager_t
 /*!
-  These macros are for facilitate the use of this library.
+  This is a "class" of scheduler_manager_t type.
 */
-#define   ERROR_SWITCH_NOT_INITIALIZED      0
-#define   SWITCH_INITIALIZED                1
+typedef struct {
+  void (*vSetRoundRobinMode)(void);                                   /*!< void "method". */
+  void (*vSetRelativeMode)(void);                                     /*!< void "method". */
+  void (*vSetAbsoluteMode)(void);                                     /*!< void "method". */
+  void (*vSetFullAbsoluteMode)(void);                                 /*!< void "method". */
+  void (*vStart)(void);                                               /*!< void "method". */
+} scheduler_manager_t;
 
-#define   TURNED_OFF_SWITCH                 0
-#define   TURNED_ON_SWITCH                  1
-
-//! Type Definition: switch_t
-/*!
-  This typedef exist for organization purpose. This type is equivalent of a 8-bit unsigned integer.
-*/
-typedef uint8_t switch_t;
-
-uint8_t ui8SwitchInit(switch_t* spSwitch);          /*!< 8-bits integer type function. */
-void vTurnOnSwitch(switch_t* sSwitch);              /*!< 8-bits integer type function. */
-void vTurnOffSwitch(switch_t* sSwitch);             /*!< 8-bits integer type function. */
-uint8_t ui8GetSwitchStatus(switch_t* sSwitch);      /*!< 8-bits integer type function. */
+extern const scheduler_manager_t Scheduler PROGMEM;                   /*!< Scheduler manager "object". */
 
 #ifdef __cplusplus
   }

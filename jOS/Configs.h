@@ -44,11 +44,10 @@
 /*!
   Set the hal system here.
   Availables:
-    - NoMicrocontroler
     - ArduinoAVR
     - HALru
 */
-#define   NoMicrocontroller
+#define   HALru
 
 //! Configuration: Task Manager
 /*!

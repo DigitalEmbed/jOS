@@ -42,6 +42,10 @@
 
 #include "./TaskScheduler.h"
 
+//! Macros: Co-Routine Macros
+/*!
+  These macros are for facilitate the use of this library.
+*/
 #define   COUNTER_OVERFLOW            1
 #define   COUNTER_RUNNING             0
 

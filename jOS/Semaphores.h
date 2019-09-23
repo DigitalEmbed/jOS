@@ -47,7 +47,7 @@
 
 //! Macros: Semaphore Satus
 /*!
-  This macros are for facilitate the use of this library.
+  These macros are for facilitate the use of this library.
 */
 #define   BINARY                            0
 #define   COUNTING                          1

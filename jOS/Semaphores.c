@@ -32,7 +32,7 @@ void vSemaphoresInterrupt(void){
 
 //! Function: Semaphore Manager Initializer
 /*!
-  Initialize the semaphore manager.
+  Initializes the semaphore manager.
 */
 void vSemaphoreManagerInit(void){
   vSemaphoreTimerConfiguration(&vSemaphoresInterrupt);
@@ -40,7 +40,7 @@ void vSemaphoreManagerInit(void){
 
 //! Function: Semaphore Initializer
 /*!
-  Initialize a Semaphore.
+  Initializes a Semaphore.
   \param smpSemaphore is a semaphore_t pointer type.
   \param ui8SemaphoreType is a 8-bit integer.
   \return Returns NO_SUCH_MEMORY_FOR_SEMAPHORE or SEMAPHORE_INITIALIZED.

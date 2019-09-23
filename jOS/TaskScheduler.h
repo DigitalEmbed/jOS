@@ -46,7 +46,7 @@
 
 //! Macros: Task Satus
 /*!
-  This macros are for facilitate the use of this library.
+  These macros are for facilitate the use of this library.
 */
 #define     EMPTY                               0
 #define     ENABLED                             1
@@ -55,7 +55,7 @@
 
 //! Macros: Scheduler Satus
 /*!
-  This macros are for facilitate the use of this library.
+  These macros are for facilitate the use of this library.
 */
 #define     STOPED                              0
 #define     PAUSED                              1
@@ -63,7 +63,7 @@
 
 //! Macros: Scheduler Modes
 /*!
-  This macros are for facilitate the use of this library.
+  These macros are for facilitate the use of this library.
 */
 #define     ROUND_ROBIN_MODE                    0   
 #define     RELATIVE_PRIORITY_MODE              1
@@ -72,20 +72,20 @@
 
 //! Macros: Cooperative Mode
 /*!
-  This macros are for facilitate the use of this library.
+  This macros is for facilitate the use of this library.
 */
 #define     COOPERATIVE_MODE                    0
 
 //! Macros: Task Types
 /*!
-  This macros are for facilitate the use of this library.
+  These macros are for facilitate the use of this library.
 */
 #define     TIMER_TYPE                          0
 #define     COOPERATIVE_THREAD_TYPE             1
 
 //! Macros: Thread and Timer types
 /*!
-  This macros are for facilitate the use of this library.
+  These macros are for facilitate the use of this library.
 */
 #define     thread_t                            task_return_t
 #define     timer_t                             task_return_t
@@ -118,37 +118,36 @@ typedef struct {
   uint16_t ui16TimeCounter;                                                                                                                                                     /*!< 16-bit integer type. */
 } task_handler_t;
 
+//! Type Definition: task_t
+/*!
+  This typedef exist for organization purpose.
+*/
+typedef task_handler_t* task_t;
+
+//! Macro: Thread Creator
+/*!
+  Creates a thread and add it into task manager.
+  \param cpTaskName a char string vector. It's the task name.
+  \param tTaskFunction a void function pointer. It's the task callback.
+  \param vpArguments a void pointer. It's the task callback argument.
+  \param ui8Priority is a 8-bit unsigned integer. It's the task priority.
+  \param ui8Status is a 8-bit unsigned integer. It's the task start status (ENABLED or DISABLED).
+  \return Returns the object.
+*/
+#define     tCreateThread(cpTaskName, tTaskFunction, vpArguments, ui8Priority, ui8Status)                   tCreateTask(cpTaskName, tTaskFunction, vpArguments, COOPERATIVE_MODE, ui8Priority, ui8Status);
+
 //! Macro: Timer Creator
 /*!
-  Create a timer type task_t.
+  Creates a timer and add it into task manager.
   \param cpTaskName a char string vector. It's the task name.
   \param tTaskFunction a void function pointer. It's the task callback.
   \param vpArguments a void pointer. It's the task callback argument.
   \param ui16Period is a 16-bit unsigned integer. It's the callback repetition time.
   \param ui8Priority is a 8-bit unsigned integer. It's the task priority.
   \param ui8Status is a 8-bit unsigned integer. It's the task start status (ENABLED or DISABLED).
-  \return Returns the task pointer.
+  \return Returns the object.
 */
-#define     tCreateTimer(cpTaskName, tTaskFunction, vpArguments, ui16Period, ui8Priority, ui8Status)            tCreateTask(cpTaskName, tTaskFunction, vpArguments, ui16Period, ui8Priority, ui8Status);
-
-
-//! Macro: Thread Creator
-/*!
-  Create a thread type task_t.
-  \param cpTaskName a char string vector. It's the task name.
-  \param tTaskFunction a void function pointer. It's the task callback.
-  \param vpArguments a void pointer. It's the task callback argument.
-  \param ui8Priority is a 8-bit unsigned integer. It's the task priority.
-  \param ui8Status is a 8-bit unsigned integer. It's the task start status (ENABLED or DISABLED).
-  \return Returns the task pointer.
-*/
-#define     tCreateThread(cpTaskName, tTaskFunction, vpArguments, ui8Priority, ui8Status)                       tCreateTask(cpTaskName, tTaskFunction, vpArguments, COOPERATIVE_MODE, ui8Priority, ui8Status);
-
-//! Type Definition: task_t
-/*!
-  This typedef exist for organization purpose.
-*/
-typedef task_handler_t* task_t;
+#define     tCreateTimer(cpTaskName, tTaskFunction, vpArguments, ui16Period, ui8Priority, ui8Status)        tCreateTask(cpTaskName, tTaskFunction, vpArguments, ui16Period, ui8Priority, ui8Status);
 
 extern task_t tCurrentTask;                                                                                                                                                     /*!< task_t type. */
 

@@ -1,4 +1,4 @@
-//! jOS Version 2.0b
+//! winTerface Version 1.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -33,36 +33,35 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Switch_h
-#define Switch_h
+#ifndef Semaphores_Class_h
+#define Semaphores_Class_h
 
 #ifdef __cplusplus
   extern "C" {
 #endif
 
-#include <stdio.h>
-#include <inttypes.h>
+#include <jOS.h>
+#include <avr/pgmspace.h>
 
-//! Macros: Switch Satus
+//! Macro: semaphore_t "object constructor"
 /*!
-  These macros are for facilitate the use of this library.
+  "Construct" a semaphore_t "object".
+  \return Returns the object.
 */
-#define   ERROR_SWITCH_NOT_INITIALIZED      0
-#define   SWITCH_INITIALIZED                1
+#define   NewSemaphore()   {0}
 
-#define   TURNED_OFF_SWITCH                 0
-#define   TURNED_ON_SWITCH                  1
-
-//! Type Definition: switch_t
+//! Type Definition: semaphore_manager_t
 /*!
-  This typedef exist for organization purpose. This type is equivalent of a 8-bit unsigned integer.
+  This is a "class" of semaphore_manager_t type.
 */
-typedef uint8_t switch_t;
+typedef struct {
+  uint8_t (*ui8Begin)(semaphore_t* smObjectSemaphore, uint8_t ui8SemaphoreType, uint16_t ui16ResetTime);            /*!< uint8_t "method". */
+  uint8_t (*ui8Take)(semaphore_t* smObjectSemaphore);                                                               /*!< uint8_t "method". */
+  uint8_t (*ui8Return)(semaphore_t* smObjectSemaphore);                                                             /*!< uint8_t "method". */
+  void (*vSetWatchdog)(void);                                                                                       /*!< void "method". */
+} semaphore_manager_t;
 
-uint8_t ui8SwitchInit(switch_t* spSwitch);          /*!< 8-bits integer type function. */
-void vTurnOnSwitch(switch_t* sSwitch);              /*!< 8-bits integer type function. */
-void vTurnOffSwitch(switch_t* sSwitch);             /*!< 8-bits integer type function. */
-uint8_t ui8GetSwitchStatus(switch_t* sSwitch);      /*!< 8-bits integer type function. */
+extern const semaphore_manager_t Semaphore PROGMEM;                                                                 /*!< Semaphore manager "object". */
 
 #ifdef __cplusplus
   }

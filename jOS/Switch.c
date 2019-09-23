@@ -11,7 +11,7 @@ xCreateBitVector(bvSwitches, AMOUNT_OF_SWITCHES);
 
 //! Function: Switch Initializer
 /*!
-  Initialize a Switch.
+  Initializes a Switch.
   \param sSwitch is a switch_t pointer type.
   \return Returns ERROR_SWITCH_NOT_INITIALIZED or SWITCH_INITIALIZED.
 */
@@ -28,7 +28,7 @@ uint8_t ui8SwitchInit(switch_t* spSwitch){
 
 //! Function: Turn On Switch
 /*!
-  Turn on a Switch.
+  Turns on a Switch.
   \param sSwitch is a switch_t type.
 */
 void vTurnOnSwitch(switch_t* sSwitch){
@@ -37,7 +37,7 @@ void vTurnOnSwitch(switch_t* sSwitch){
 
 //! Function: Turn Off Switch
 /*!
-  Turn off a Switch.
+  Turns off a Switch.
   \param sSwitch is a switch_t type.
 */
 void vTurnOffSwitch(switch_t* sSwitch){
@@ -46,7 +46,7 @@ void vTurnOffSwitch(switch_t* sSwitch){
 
 //! Function: Switch Status Getter
 /*!
-  Get a Switch status.
+  Gets a Switch status.
   \param sSwitch is a switch_t type.
   \return Returns BUSY or NOT_BUSY.
 */

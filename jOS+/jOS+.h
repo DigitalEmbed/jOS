@@ -1,9 +1,9 @@
-//! jOS Version 2.0b
+//! jOS+ Version 1.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
 
-  Permissions of this copyleft license are conditioned on making available
+  Permissions of this copy left license are conditioned on making available
   complete source code of licensed works and modifications under the same
   license or the GNU GPLv3. Copyright and license notices must be preserved.
   Contributors provide an express grant of patent rights. However, a larger
@@ -12,65 +12,46 @@
   the larger work.
 
   * Permissions:
-    -> Commercial use;
-    -> Modification;
-    -> Distribuition;
-    -> Patent Use;
-    -> Private Use;
+    -" Commercial use;
+    -" Modification;
+    -" Distribution;
+    -" Patent Use;
+    -" Private Use;
 
   * Limitations:
-    -> Liability;
-    -> Warranty;
+    -" Liability;
+    -" Warranty;
 
   * Conditions:
-    -> License and copyright notice;
-    -> Disclose source;
-    -> State changes;
-    -> Same license (library);
+    -" License and copyright notice;
+    -" Disclose source;
+    -" State changes;
+    -" Same license (library);
 
   For more informations, check the LICENSE document. If you want to use a
   commercial product without having to provide the source code, send an email
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef jOS_H
-#define jOS_H
+#ifndef jOS_Classes_H
+#define jOS_Classes_H
 
 #ifdef __cplusplus
   extern "C" {
 #endif
 
-#define JOS_ACTIVED
-
-//! Standard C Libs
 /*!
-  Path to standard c libraries.
+  RTOS Library
 */
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <jOS.h>
 
-//! Path: EmbeddedTools
 /*!
-  Path to EmbeddedTools library.
+  Interface Libraries
 */
-#include <EmbeddedTools.h>
-
-//! Path: Tools
-/*!
-  Path to jOS system task manager libraries.
-*/
-#include "./TaskScheduler.h"
-#include "./CoRoutines.h"
+#include "./Task.h"
+#include "./Scheduler.h"
 #include "./Switch.h"
 #include "./Semaphores.h"
-
-//! Path: System
-/*!
-  Path to jOS system libraries.
-*/
-#include "./System.h"
 
 #ifdef __cplusplus
   }

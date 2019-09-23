@@ -4,7 +4,7 @@ extern uint16_t ui16pResetTime[AMOUNT_OF_SEMAPHORES];
 
 //! Function: Semaphore Taker
 /*!
-  Try take a semaphore.
+  Tries take a semaphore.
   \param smpSemaphore is a semaphore_t pointer type.
   \return Returns TASK_HOLDER or SEMAPHORE_BUSY.
 */

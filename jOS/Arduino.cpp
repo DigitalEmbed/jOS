@@ -2,7 +2,6 @@
 
 #if defined(ArduinoAVR)
 
-#include <EmbeddedTools.h>
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
@@ -23,7 +22,7 @@ void (*vTaskSchedulerCallBack)(void) = NULL;
   Function: CallBack System Interruption
 */
 ISR(TIMER1_OVF_vect){
-  TCNT1 = 63036;
+  TCNT1 = 60536;
   if (vTaskSchedulerCallBack != NULL){
     vTaskSchedulerCallBack();
   }
@@ -44,7 +43,7 @@ void vTaskTimerConfiguration(void (*vSchedulerInterruption)(void)){
   TCCR1A = 0;
   TCCR1B = 0;
   /*!
-    Set compare match register for 100 Hz (10ms) increments
+    Sets compare match register for 100 Hz (10ms) increments
     16000000 / (64 * 100) - 1 (must be <256)
   */
   TCNT1 = 63036;
@@ -54,7 +53,7 @@ void vTaskTimerConfiguration(void (*vSchedulerInterruption)(void)){
   vSetBit(TCCR1B, CS11);
   vSetBit(TCCR1B, CS10);
   /*!
-    Enable timer compare interrupt
+    Enables timer compare interrupt
   */
   vSetBit(TIMSK1, TOIE1);
   vTaskSchedulerCallBack = vSchedulerInterruption;
