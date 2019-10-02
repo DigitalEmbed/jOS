@@ -2,6 +2,7 @@
 
 #if defined(ArduinoAVR)
 
+#include <EmbeddedTools.h>
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
