@@ -44,11 +44,12 @@
 /*!
   Set the hal system here.
   Availables:
+    - NoMicrocontroller
     - ArduinoAVR
     - HALru
     - ESP12
 */
-#define   ESP12
+#define   NoMicrocontroller
 
 //! Configuration: Task Manager
 /*!
