@@ -2,7 +2,7 @@
 #include <EmbeddedTools.h>
 #include <string.h>
 
-task_handler_t thCreatedTasks[AMOUNT_OF_TASKS] = {0};                             /*!< task_handler_t type. */
+task_handler_t thCreatedTasks[AMOUNT_OF_TASKS] = {{0}};                           /*!< task_handler_t type. */
 task_handler_t* thpBufferedTasks[AMOUNT_OF_TASKS] = {NULL};                       /*!< task_handler_t pointer type. */
 task_t tCurrentTask = NULL;                                                       /*!< task_t type. */
 uint8_t ui8CreatedTaskCounter = 0;                                                /*!< uint8_t type. */

@@ -46,8 +46,9 @@
   Availables:
     - ArduinoAVR
     - HALru
+    - ESP12
 */
-#define   HALru
+#define   ESP12
 
 //! Configuration: Task Manager
 /*!
