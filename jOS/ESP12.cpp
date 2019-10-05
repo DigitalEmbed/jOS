@@ -60,8 +60,6 @@ void vSystemSleepConfiguration(void){
   Edit this function to put your microcontroller to sleep. Remember to enable in a mode where timer interrupts are not turned off.
 */
 void vSystemSleep(void){
-  ESP.deepSleep(timer1_read()/80);
-  timer1_write(ui8TickMS*80000);
 }
 
 //! Function: Editable System Sleep
