@@ -207,16 +207,14 @@ void vStartScheduler(void){
       if (thpBufferedTasks[ui8Counter]->ui8Status == READY){
         task_return_t trReturn = END;
         tCurrentTask = thpBufferedTasks[ui8Counter];
+        tCurrentTask->ui8Status = ENABLED;
+        ui8ReadyTaskCounter--;
         if (tCurrentTask->tTaskFunction != NULL){
           vEnableWatchdog();
           trReturn = tCurrentTask->tTaskFunction(tCurrentTask->vpArguments);
           vDisableWatchdog();
         }
         vCheckTaskReturn(trReturn);
-        if (tCurrentTask != NULL && tCurrentTask->ui8Status == READY && tCurrentTask->ui16TimeCounter == 0){
-          tCurrentTask->ui8Status = ENABLED;
-          ui8ReadyTaskCounter--;
-        }
       }
       if (ui8SchedulerType != ROUND_ROBIN_MODE && (thpBufferedTasks[ui8Counter]->ui8Priority > ui8HighestPriority || ui8Counter >= (ui8CreatedTaskCounter - 1))){
         ui8Counter = 0;
