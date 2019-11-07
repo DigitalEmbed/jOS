@@ -77,7 +77,7 @@ void vSystemSleep(void){
   Edit this function to enable watchdog of your microcontroller.
 */
 void vEnableWatchdog(void){
-  vStartWatchdog(INTERRUPT_RESET_MODE, WHATCHDOG_TIMER_1S);
+  vStartWatchdog(INTERRUPT_RESET_MODE, WATCHDOG_TIMER_1S);
 }
 
 //! Function: Editable System Watchdog Disabler
