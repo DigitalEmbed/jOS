@@ -11,7 +11,7 @@ The system will work with the Timer 2 (8-bits) of the micro controller. The adva
 
 #### Timebase
 
-Every 10 ms will interrupt the system for the management of tasks. This time is fully configurable by changing the ui8TickMS variable. **you must remember that the variable __ui8TickMS must be modified with the value of the interrupt time, in milliseconds**.
+Every 10 ms will interrupt the system for the management of tasks. This time is fully configurable by changing the ui8TickMS variable. When changing the time base, **you must remember that the variable __ui8TickMS must be modified with the value of the interrupt time, in milliseconds**.
 
 ### Arduino Framework Users
 
@@ -91,9 +91,29 @@ This system was developed by **Jorge Henrique Moreira Santana**:
 
 O sistema trabalhará com o Timer 2 (8-bits) do microcontrolador. A vantagem de se trabalhar com este temporizador é que ele consegue despertar o microcontrolador quando ele estiver no modo **SLEEP_MODE_PWR_SAVE**, garantindo assim uma maior economia de energia.
 
-### Base de tempo
+#### Base de tempo
 
-A cada 10 ms acontecerá a interrupção do sistema para o gerenciamento das tarefas. Esse tempo é totalmente configurável alterando a variável ui8TickMS.
+A cada 10 ms acontecerá a interrupção do sistema para o gerenciamento das tarefas. Esse tempo é totalmente configurável alterando a variável ui8TickMS. Ao mudar a base de tempo, **é preciso lembrar que a variável __ui8TickMS deve ser modificada com o valor do tempo de interrupção, em milissegundos**.
+
+### Usuários da Framework Arduino
+
+É possvel utilizar este port juntamente com a framework Arduino e grande parte das bibliotecas feitas para ela. Teoricamente, todos os microcontroladores Arduino AVR possuem compatibilidade com o sistema jOS com este arquivo. Os sistemas testados foram:
+
+- Arduino UNO (ATMega328p)
+- Arduino MEGA (ATMega2560)
+
+O sistema trabalhará com o Timer 1 (16-bits) do microcontrolador para que não haja tantas incompatibilidades com as bibliotecas feitas para o a framework Arduino. A desvantagem é que o Timer 1 só consegue despertar o microcontrolador quando ele estiver no modo **SLEEP_MODE_IDLE**.
+
+### Arduino IDE
+
+Infelizmente, esta biblioteca não funciona na IDE fornecida pela Arduino: O linker parece não conseguir encontrar os arquivos da solução. Recomendo a utilização da IDE [PlatformIO](https://platformio.org/platformio-ide). A instalação é facil:
+
+ - Baixe o Microsoft Visual Studio Code ou o Atom;
+ - Nessas IDEs existem gerenciadores de extensões. Procure por PlatformIO e instale;
+
+#### Base de tempo
+
+A cada 20 ms acontecerá a interrupção do sistema para o gerenciamento das tarefas. Esse tempo é totalmente configurável se necessário. Ao mudar a base de tempo, **é preciso lembrar que a variável __ui8TickMS deve ser modificada com o valor do tempo de interrupção, em milissegundos**.
 
 ### Licença
 
