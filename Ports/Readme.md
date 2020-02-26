@@ -9,9 +9,29 @@ It is possible to use this port together with the HALru framework. The micro con
 
 The system will work with the Timer 2 (8-bits) of the micro controller. The advantage of working with this timer is that it can wake the microcontroller when it is in the **SLEEP_MODE_PWR_SAVE** mode, thus ensuring greater power savings.
 
-### Timebase
+#### Timebase
 
-Every 10 ms will interrupt the system for the management of tasks. This time is fully configurable by changing the ui8TickMS variable.
+Every 10 ms will interrupt the system for the management of tasks. This time is fully configurable by changing the ui8TickMS variable. **you must remember that the variable __ui8TickMS must be modified with the value of the interrupt time, in milliseconds**.
+
+### Arduino Framework Users
+
+It is possible to use this port together with the Arduino framework and most of the libraries made for it. Theoretically, all Arduino AVR ATMega microcontrollers are compatible with the jOS system with this file. The systems tested were:
+
+- Arduino UNO (ATMega328p)
+- Arduino MEGA (ATMega2560)
+
+The system will work with the Timer 1 (16-bits) of the microcontroller so that there are not so many incompatibilities with the libraries made for the Arduino framework. The disadvantage is that Timer 1 can only wake the microcontroller when it is in **SLEEP_MODE_IDLE** mode.
+
+### Arduino IDE
+
+Unfortunately, this library does not work in the IDE provided by Arduino: The linker does not seem to be able to find the solution files. I recommend using the [PlatformIO](https://platformio.org/platformio-ide) IDE. The installation is easy:
+
+- Download Microsoft Visual Studio Code or Atom;
+- There are extension managers in these IDEs. Look for PlatformIO and install it;
+
+#### Timebase
+
+Every 20 ms will interrupt the system for the management of tasks. This time is fully configurable if necessary. When changing the time base, **you must remember that the variable __ui8TickMS must be modified with the value of the interrupt time, in milliseconds**.
 
 ### License
 
