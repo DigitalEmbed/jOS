@@ -1,4 +1,4 @@
-//! Example 02 - Sharing a variable between tasks
+//! Example 03 - Sharing a variable between tasks
 /*!
   This simply example demonstrates how to share a variable between tasks.
 
