@@ -49,7 +49,7 @@ To use RTOS on your system, you must:
   - Import the library *jOS.h* into your *main.c* file.
   - In the *Ports* folder of this repository there are several folders with names of microcontrollers or prototype board frameworks.
     - If there is a folder for your hardware, simply install the *System* library in your IDE.
-    - If there is no folder for your hardware, you will need to edit the *System.c* file in the */jOS* directory using the *How to port?*. topic.
+    - If there is no folder for your hardware, you will need to edit the *System.c* file in the */jOS* directory using the *How to port?* topic.
   - In the */jOS* folder there is the *jOS.h* file. In it, you should define:
     - The amount of switches and semaphores your system will have;
     - The amount of priorities your firmware will have;
@@ -63,20 +63,20 @@ To use RTOS on your system, you must:
 In the */Port* directory, the *NoMicrocontroller.c* file exists. Create a copy of this file with the name of your microcontroller and, in it, edit the functions:
 
   - **System_restart(void)**: Restart the system.
-  - **System_taskTimerConfiguration(void(vSchedulerInterruption)(void))**: Interrupt by system timer. The function that should be called during the interrupt is the vSchedulerInterruption, which is in the parameter of this function. This function is of type void, with no parameters. Finally, modify the global variable [  ]ui8TaskTickMS with the value of the interrupt time, in milliseconds.
-  - **System_semaphoreTimerConfiguration(void(vfSemaphoresInterruption)(void))**: Interrupt by system timer. The function that should be called during the interrupt is the vSchedulerInterruption, which is in the parameter of this function. This function is of type void, with no parameters. Finally, modify the global variable [  ]ui8SemaphoreTickMS with the value of the interrupt time, in milliseconds. This function is mandatory for the system. You can use the same timer used in the System_taskTimerConfiguration function.
+  - **System_taskTimerConfiguration(void(vSchedulerInterruption)(void))**: Interrupt by task scheduler timer. The function that should be called during the interrupt is the vSchedulerInterruption, which is in the parameter of this function. This function is of type void, with no parameters. Finally, modify the global variable [  ]ui8TaskTickMS with the value of the interrupt time, in milliseconds.
+  - **System_semaphoreTimerConfiguration(void(vfSemaphoresInterruption)(void))**: Interrupt by semaphore whatchdog timer. The function that should be called during the interrupt is the vfSemaphoresInterruption, which is in the parameter of this function. This function is of type void, with no parameters. Finally, modify the global variable [  ]ui8SemaphoreTickMS with the value of the interrupt time, in milliseconds. This function is mandatory for the system. You can use the same timer used in the System_taskTimerConfiguration function.
   - **System_sleepConfiguration(void)**: This is the sleep mode setting function.
   - **System_sleep(void)**: Makes the system sleep.
   - **System_enableHardwareWatchdog(void)**: This is the hardware watchdog enabler function.
   - **System_disableHardwareWatchdog(void)**: This is the hardware watchdog disabler function.
   - **System_enableInterrupts(void)**: Resumes all interrupts of the system.
   
-  Edit line 3 macro by your system name:
+  Edit the macro in line 3, replacing *NoMicrocontroller* with the name of your system:
   
-    #if defined(ArduinoAVR)       - Older
-    #if defined(Your_System)      - Newer
+    #if defined(NoMicrocontroller)    - Older
+    #if defined(Your_System)          - Newer
   
-  In *Configs.h* file in */jOS* path, find the **Configuration: HAL** and replace the macro definition with your system macro created previously:
+  In *Configs.h*, in the */jOS* folder, find the configuration **Configuration: HAL** and replace the macro there defined with **the same name given to your system in the previous step**:
   
     //! Configuration: HAL
     /*!
@@ -211,18 +211,33 @@ Para utilizar o RTOS no seu sistema, você deve:
 
 No diretório *"/jOS/System"*, existe o arquivo *System.c*. Nele, você deverá editar as funções:
 
-  - **vSystemRestart()**: Reinicia o sistema. Essa função é obrigatória para o sistema.  
-  - **vSystemSleep()**: Faz o sistema dormir. Essa função é opcional para o sistema.
-  - **vSystemWakeUp()**: Faz o sistema dormir. Essa função é opcional para o sistema, mas deve ser preenchida caso a função vSystemSleep() seja preenchida.
-  - **vSystemTimerInterruptConfiguration(isr_t isrSchedulerInterrupt)**: Interrupção por timer do sistema. A função que deverá ser chamada durante a interrupço é a isrSchedulerInterrupt, que encontra-se no parâmetro desta função. Essa função é do tipo void, sem nenhum parâmetro. Por último, modifique a variável global ui8TickMS com o valor do tempo de interrupção, em milissegundos. Essa função é obrigatória para o sistema.  
-  - **vSystemSleepConfiguration()**: É a função de configuração do modo sleep. Essa função é opcional para o sistema, mas deve ser preenchida para que as funções vSystemSleep() e vSystemWakeUp() funcionem.
-  - **vSystemHardwareWatchdogConfiguration()**: É a função de configuração do watchdog de hardware. Como não é todo microcontrolador que possui um segundo watchdog, essa função é opcional para o sistema.
-  - **vSystemSuspendRTOSInterrupts()**: Suspende as interrupções do timer utilizado pelo sistema. Em alguns casos, é imprencindível que um processo não seja interrompido por outras tarefas. Todavia, essa função deve ser usada com extrema cautela, sempre deixando o sistema suspenso pelo menor tempo possível. Essa função é opcional para o sistema.
-  - **vSystemResumeRTOSInterrupts()**: Retoma todas as interrupções do timer utilizado pelo sistema que foram suspensas na chamada da função vSystemSuspendRTOSInterrupts(). Caso o sistema não retome, seu firmware entrará em colapso. Essa função é opcional para o sistema, mas deve ser preenchida caso a função vSystemSuspendRTOSInterrupts() seja preenchida.
-  - **vSystemSuspendAllInterrupts()**: Suspende todas as interrupções do sistema. Em alguns casos, é imprencindível que um processo não seja interrompido. Todavia, essa função deve ser usada com extrema cautela, sempre deixando o sistema suspenso pelo menor tempo possível. Essa função é opcional para o sistema.
-  - **vSystemResumeAllInterrupts()**: Retoma todas as interrupções do sistema que foram suspensas na chamada da função vSystemSuspendAllInterrupts(). Caso o sistema não retome, seu firmware entrará em colapso. Essa função é opcional para o sistema, mas deve ser preenchida caso a função vSystemSuspendAllInterrupts() seja preenchida.
-  - **vSystemRestartTimerInit()**: Configura um temporizador para que o mesmo reinicie após um determinado tempo. Lembrando que o tempo configurado deve ser **menor** que, se configurado, o do vSystemHardwareWatchdogConfiguration(), fazendo o papel de um watchdog por software. Essa função é obrigatória para o sistema.
-  - **vSystemRestartTimerStop()**: Para e reseta o temporizador de reinicialização. Essa função é obrigatória para o sistema.
+  - **System_restart(void)**: Reinicia o sistema.
+  - **System_taskTimerConfiguration(void(vSchedulerInterruption)(void))**: Interrupção por timer do gerenciador de tarefas. A função que deverá ser chamada durante a interrupço é a vSchedulerInterruption, que encontra-se no parâmetro desta função. Essa função é do tipo void, sem nenhum parâmetro. Por último, modifique a variável global [  ]ui8TaskTickMS com o valor do tempo de interrupção, em milissegundos.
+  - **System_semaphoreTimerConfiguration(void(vfSemaphoresInterruption)(void))**: Interrupção por timer do watchdog de semáforos. A função que deverá ser chamada durante a interrupço é a vfSemaphoresInterruption, que encontra-se no parâmetro desta função. Essa função é do tipo void, sem nenhum parâmetro. Por último, modifique a variável global [  ]ui8SemaphoreTickMS com o valor do tempo de interrupção, em milissegundos.
+  - **System_sleepConfiguration(void)**: Função de configuração do modo Sleep.
+  - **System_sleep(void)**: Faz o sistema dormir.
+  - **System_enableHardwareWatchdog(void)**: Habilita o watchdog por hardware.
+  - **System_disableHardwareWatchdog(void)**: Desabilita o watchdog por hardware.
+  - **System_enableInterrupts(void)**: Habilita todas as interupções do microcontrolador.
+  
+  Edite a macro da linha 3, substituindo *NoMicrocontroller* pelo nome do seu sistema.
+  
+    #if defined(NoMicrocontroller)      - Older
+    #if defined(Your_System)            - Newer
+  
+  Em *Configs.h*, na pasta */jOS*, encontre a configuração **Configuration: HAL** e substitua a macro lá definida pelo **mesmo nome dado ao seu sistema no passo anterior**:
+  
+    //! Configuration: HAL
+    /*!
+      Set the hal system here.
+      Availables:
+      - NoMicrocontroller
+      - ArduinoAVR
+      - HALru
+      - ESP12
+      - Your_System
+    */
+    #define Your_System
 
 ### Licença
 
