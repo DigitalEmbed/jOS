@@ -7,7 +7,8 @@
   /*!
     This variable is the interrupt time. Do not forget to fill it!
   */
-  const uint8_t __ui8TickMS = 10;
+  const uint8_t __ui8TaskTickMS = 1;
+  const uint8_t __ui8SemaphoreTickMS = 1;
 
   /*!
     This variables is the interrupt callbacks!

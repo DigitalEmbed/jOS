@@ -10,7 +10,8 @@
   /*!
     This variable is the interrupt time. Do not forget to fill it!
   */
-  const uint8_t __ui8TickMS = 10;
+  const uint8_t __ui8TaskTickMS = 10;
+  const uint8_t __ui8SemaphoreTickMS = __ui8TaskTickMS;
 
   /*!
     This variables is the interrupt callbacks!
@@ -31,7 +32,14 @@
     Converting "void (*pfunc)(void*)" to "void (*pfunc)(void)"
   */
   void vSubTimerACallback(void* vpArguments) NestedMode {
-    vfSemaphoresManagerCallback();
+    static uint8_t ui8Counter = 0;
+    if (ui8Counter == 4){
+      ui8Counter = 0;
+      vfSemaphoresManagerCallback();
+    }
+    else{
+      ui8Counter++;
+    }
   } EndNestedMode;
 
   //! Function: Editable System Timer Scheduler Interrupt Configuration
@@ -40,7 +48,7 @@
   */
   void System_taskTimerConfiguration(void (*vSchedulerInterruption)(void)){
     vTIMERInit(TIMER_2);
-    vSetTIMERPeriodMS(TIMER_2, __ui8TickMS);
+    vSetTIMERPeriodMS(TIMER_2, __ui8TaskTickMS);
     vfTaskSchedulerCallback = vSchedulerInterruption;
     vAttachTIMERInterrupt(TIMER_2, MASTER_TIMER, vMasterTimerCallback, NULL);
   }

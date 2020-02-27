@@ -8,7 +8,8 @@
   /*!
     This variable is the interrupt time. Do not forget to fill it!
   */
-  const uint8_t __ui8TickMS = 1;
+  const uint8_t __ui8TaskTickMS = 1;
+  const uint8_t __ui8SemaphoreTickMS = 10;
 
   /*!
     This variables is the interrupt callbacks!
@@ -20,12 +21,19 @@
     Function: Callback System Interruption
   */
   void ICACHE_RAM_ATTR vSystemCallback(void){
-    timer1_write(__ui8TickMS*80000);
+    timer1_write(__ui8TaskTickMS*80000);
+    static uint8_t ui8Counter = 0;
     if (vfTaskSchedulerCallback != NULL){
       vfTaskSchedulerCallback();
     }
-    if (vfSemaphoresManagerCallback != NULL){
-      vfSemaphoresManagerCallback();
+    if (ui8Counter == 9){
+      ui8Counter = 0;
+      if (vfSemaphoresManagerCallback != NULL){
+        vfSemaphoresManagerCallback();
+      }
+    }
+    else{
+      ui8Counter++;
     }
   }
 
@@ -36,7 +44,7 @@
   void System_taskTimerConfiguration(void (*vSchedulerInterruption)(void)){
     timer1_attachInterrupt(&vSystemCallback);
     timer1_enable(TIM_DIV1, TIM_EDGE, TIM_SINGLE);
-    timer1_write(__ui8TickMS*80000);
+    timer1_write(__ui8TaskTickMS*80000);
     vfTaskSchedulerCallback = vSchedulerInterruption;
   }
 

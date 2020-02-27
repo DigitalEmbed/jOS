@@ -12,7 +12,8 @@
   /*!
     This variable is the interrupt time. Do not forget to fill it!
   */
-  const uint8_t __ui8TickMS = 10;
+  const uint8_t __ui8TaskTickMS = 10;
+  const uint8_t __ui8SemaphoreTickMS = 50;
 
   /*!
     This variables is the interrupt callbacks!
@@ -25,11 +26,18 @@
   */
   ISR(TIMER1_OVF_vect){
     TCNT1 = 63036;
+    static uint8_t ui8Counter = 0;
     if (vfTaskSchedulerCallback != NULL){
       vfTaskSchedulerCallback();
     }
-    if (vfSemaphoresManagerCallback != NULL){
-      vfSemaphoresManagerCallback();
+    if (ui8Counter == 4){
+      ui8Counter = 0;
+      if (vfSemaphoresManagerCallback != NULL){
+        vfSemaphoresManagerCallback();
+      }
+    }
+    else{
+      ui8Counter++;
     }
   }
 

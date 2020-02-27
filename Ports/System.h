@@ -44,7 +44,8 @@
 #include <stdio.h>
 #include <EmbeddedTools.h>
 
-extern const uint8_t __ui8TickMS;                                                             /*!< extern const 8-bit integer type variable. */
+extern const uint8_t __ui8TaskTickMS;                                                         /*!< extern const 8-bit integer type variable. */
+extern const uint8_t __ui8SemaphoreTickMS;                                                    /*!< extern const 8-bit integer type variable. */
 
 void System_taskTimerConfiguration(void (*vfSchedulerInterruption)(void));                    /*!< void type function. */
 void System_semaphoreTimerConfiguration(void (*vfSemaphoresInterruption)(void));              /*!< void type function. */
