@@ -49,7 +49,7 @@
     - HALru
     - ESP12
   */
-  #define ArduinoAVR
+  #define NoMicrocontroller
 
   //! Configuration: RTOS Auto Initialization
   /*!
