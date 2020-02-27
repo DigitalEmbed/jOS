@@ -189,8 +189,8 @@ int main(){
   /*!
     Tasks installation.
   */
-  newTimer(tTask1, "Task1", &vTask1, &sTaskFlag, 200, 100, 1, TASK_STATUS_ENABLED);
-  newTimer(tBlink, "Blink", &vBlink, &sTaskFlag, 1000, 100, 1, TASK_STATUS_ENABLED);
+  newTimer(tTask1, "Task1", &vTask1, &sTaskFlag, 200, 100, 1, TASK_MODE_REPEAT, TASK_STATUS_ENABLED);
+  newTimer(tBlink, "Blink", &vBlink, &sTaskFlag, 1000, 100, 1, TASK_MODE_REPEAT, TASK_STATUS_ENABLED);
   newThread(tBlink, "Task2", &vTask2, &sTaskFlag, 100, 1, TASK_STATUS_ENABLED);
 
   #if !(defined(__AUTO_INITIALIZATION_ENABLE__))
