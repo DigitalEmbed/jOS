@@ -73,12 +73,12 @@ In the */Port* directory, the *NoMicrocontroller.c* file exists. Create a copy o
   
   Edit line 3 macro by your system name:
   
-    - **#if defined(~~ArduinoAVR~~)** - Older
-    - **#if defined(Your_System)**    - Newer
+    #if defined(ArduinoAVR)       - Older
+    #if defined(Your_System)    - Newer
   
   In *Configs.h* file in */jOS* path, find the **Configuration: HAL** and replace the macro definition with your system macro created previously:
   
-    **//! Configuration: HAL**
+    //! Configuration: HAL
     /*!
       Set the hal system here.
       Availables:
@@ -88,7 +88,7 @@ In the */Port* directory, the *NoMicrocontroller.c* file exists. Create a copy o
       - ESP12
       - Your_System
     */
-    **#define Your_System**
+    #define Your_System
 
 ### License
 
