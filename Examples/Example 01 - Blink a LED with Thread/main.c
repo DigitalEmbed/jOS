@@ -1,4 +1,4 @@
-//! Example 01 - Blink a LED
+//! Example 01 - Blink a LED with Thread
 /*!
   This simply example demonstrates the use of task manager.
 
