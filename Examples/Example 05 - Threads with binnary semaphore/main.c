@@ -1,4 +1,4 @@
-//! Example 04 - Co-routines with binnary semaphore
+//! Example 05 - Threads with binnary semaphore
 /*!
   This simply example demonstrates how to share a variable between tasks.
 
