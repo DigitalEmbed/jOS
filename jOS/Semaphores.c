@@ -39,7 +39,7 @@ defined(__MINIMUM_SEMAPHORE_TIMEOUT_MS__) && (__AMOUNT_OF_SEMAPHORES__ > 0) && (
     }
     for (ui8Counter = 0 ; __smSemaphoresVector[ui8Counter].smsSemaphoreStatus != SEMAPHORE_STATUS_EMPTY ; ui8Counter++){
       if (__smSemaphoresVector[ui8Counter].smsSemaphoreStatus == SEMAPHORE_STATUS_BUSY){
-        if (__smSemaphoresVector[ui8Counter].ui16TimeCounter < __ui8TickMS){
+        if (__smSemaphoresVector[ui8Counter].ui16TimeCounter < __ui8SemaphoreTickMS){
           if (__vfWatchdogCallback != NULL){
             __vfWatchdogCallback(__vpWatchdogCallbackArguments);
           }
@@ -94,7 +94,7 @@ defined(__MINIMUM_SEMAPHORE_TIMEOUT_MS__) && (__AMOUNT_OF_SEMAPHORES__ > 0) && (
     __smSemaphoresVector[__ui8AmountOfSemaphores].smsSemaphoreStatus = SEMAPHORE_STATUS_IDLE;
     __smSemaphoresVector[__ui8AmountOfSemaphores].smtSemaphoreType = smtSemaphoreType;
     __smSemaphoresVector[__ui8AmountOfSemaphores].tTaskHolder = NULL;
-    __smSemaphoresVector[__ui8AmountOfSemaphores].ui16Timeout = (ui16Timeout < __MINIMUM_SEMAPHORE_TIMEOUT_MS__) ? (__MINIMUM_SEMAPHORE_TIMEOUT_MS__)/__ui8TickMS : ui16Timeout/__ui8TickMS;
+    __smSemaphoresVector[__ui8AmountOfSemaphores].ui16Timeout = (ui16Timeout < __MINIMUM_SEMAPHORE_TIMEOUT_MS__) ? (__MINIMUM_SEMAPHORE_TIMEOUT_MS__)/__ui8SemaphoreTickMS : ui16Timeout/__ui8SemaphoreTickMS;
     *smSemaphore = &(__smSemaphoresVector[__ui8AmountOfSemaphores]);
     __ui8AmountOfSemaphores++;
     return SEMAPHORE_STATUS_CREATED;

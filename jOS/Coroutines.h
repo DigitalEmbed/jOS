@@ -100,7 +100,7 @@
   */
   #define Task_delay(ui16TimeMS)\
     __ui16TaskPeriodBackup = __tCurrentTask->ui16Period ;\
-    Task_setPeriod(NULL, ((ui16TimeMS) < __ui8TickMS ? __ui8TickMS : (ui16TimeMS - __ui8TickMS)));\
+    Task_setPeriod(NULL, ((ui16TimeMS) < __ui8TaskTickMS ? __ui8TaskTickMS : (ui16TimeMS - __ui8TaskTickMS)));\
     __tCurrentTask->ui16Line = __LINE__ ; __ui8TaskYield = 1 ; return ; case __LINE__:\
     Task_setPeriod(NULL, __ui16TaskPeriodBackup);\
     __ui8TaskYield = 0;

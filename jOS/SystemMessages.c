@@ -34,6 +34,7 @@
 */
 
 #include "./Configs.h"
+#include <System.h>
 
 //! System Message: Auto Initialization Macro Status
 /*!
@@ -80,7 +81,7 @@
   Please don't modify this.
 */
 #if (!(defined(__SEMAPHORES_MANAGER_ENABLE__) && defined(__AMOUNT_OF_SEMAPHORES__) &&\
-  defined(__MINIMUM_SEMAPHORE_TIMEOUT_MS__) && (__AMOUNT_OF_SEMAPHORES__ > 0) && (__MINIMUM_SEMAPHORE_TIMEOUT_MS__ > 0)))
+defined(__MINIMUM_SEMAPHORE_TIMEOUT_MS__) && (__AMOUNT_OF_SEMAPHORES__ > 0) && (__MINIMUM_SEMAPHORE_TIMEOUT_MS__ > 0)))
   #error Invalid semaphores macros values! Please check __MINIMUM_SEMAPHORE_TIMEOUT_MS__ and __AMOUNT_OF_SEMAPHORES__ macros values.
 #endif
 

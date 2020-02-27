@@ -63,16 +63,16 @@ defined(__SCHEDULER_DEFAULT_MODE__) && (__SCHEDULER_DEFAULT_MODE__ >= SCHEDULER_
     (*tTask)->vpArguments = vpArguments;
     (*tTask)->tsStatus = tsStatus;
     (*tTask)->ui8RealAddress = __ui8EmptyTaskPosition;
-    (*tTask)->ui16Timeout = (ui16Timeout > (__MINIMUM_TASK_TIMEOUT_MS__)) ? (ui16Timeout/__ui8TickMS) : ((__MINIMUM_TASK_TIMEOUT_MS__)/__ui8TickMS);
+    (*tTask)->ui16Timeout = (ui16Timeout > (__MINIMUM_TASK_TIMEOUT_MS__)) ? (ui16Timeout/__ui8TaskTickMS) : ((__MINIMUM_TASK_TIMEOUT_MS__)/__ui8TaskTickMS);
     if (ui16Period == COOPERATIVE_MODE){
       (*tTask)->ttTaskType = TASK_TYPE_COOPERATIVE_THREAD;
-      (*tTask)->ui16Period = __ui8TickMS;
+      (*tTask)->ui16Period = __ui8TaskTickMS;
       (*tTask)->ui8Priority = ui8Priority + __MINIMUM_THREAD_PRIORITY__;
       __ui8HighestThreadPriority = SoftMath_smaller(__ui8HighestThreadPriority, (ui8Priority + 1));
     }
     else{
       (*tTask)->ttTaskType = TASK_TYPE_TIMER;
-      (*tTask)->ui16Period = (ui16Period <= __ui8TickMS) ? __ui8TickMS : (ui16Period/__ui8TickMS);
+      (*tTask)->ui16Period = (ui16Period <= __ui8TaskTickMS) ? __ui8TaskTickMS : (ui16Period/__ui8TaskTickMS);
       (*tTask)->ui8Priority = ui8Priority;
     }
     for(ui8Counter = __ui8CreatedTaskCounter ; ui8Counter > 0 ; ui8Counter --){
@@ -319,7 +319,7 @@ defined(__SCHEDULER_DEFAULT_MODE__) && (__SCHEDULER_DEFAULT_MODE__ >= SCHEDULER_
       return;
     }
     if (tTaskBuffer->tsStatus != TASK_STATUS_EMPTY){
-      tTaskBuffer->ui16Period = ui16Period/__ui8TickMS;
+      tTaskBuffer->ui16Period = ui16Period/__ui8TaskTickMS;
       if (tTaskBuffer->tsStatus == TASK_STATUS_READY && ui16Period > tTaskBuffer->ui16Period){
         tTaskBuffer->tsStatus = TASK_STATUS_ENABLED;
         tTaskBuffer->ui16TimeCounter = tTaskBuffer->ui16Period;
