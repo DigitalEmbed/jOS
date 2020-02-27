@@ -1,4 +1,4 @@
-//! Example 03 - Co-routines with a switch and another way to blink a LED
+//! Example 03 - Co-routines, threads, switches and another way to blink a LED
 /*!
   This simply example demonstrates how to share a variable between tasks.
 
@@ -30,7 +30,7 @@
     -> Disclose source;
     -> State changes;
     -> Same license (library);
-    
+
   For more informations, check the LICENSE document. If you want to use a
   commercial product without having to provide the source code, send an email
   to jorge_henrique_123@hotmail.com to talk.
