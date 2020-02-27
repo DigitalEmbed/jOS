@@ -35,68 +35,69 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
+#include <stdint.h>
+#include <stdbool.h>
 #include <jOS.h>
-#include <GPIO.h>
+
+#define vGenerateLogicLevel(ui8Pin, bLogicLevel)
+#define vSetPinMode(ui8Pin, bMode)
+#define GPIO_OUTPUT 1
+#define GPIO_INPUT 0
+#define GPIO_OUTPUT_HIGH 1
+#define GPIO_OUTPUT_LOW 0
 
 /*!
   Tasks declarations.
 */
-task_t tBlink;                                              // Task handle declaration.
-uint8_t ui8Blink(void* vpArgs){                             // All task functions must have this scope of function.
-  static uint8_t ui8LEDState = 0;                           // Static variables never will be deleted!
-  if (ui8LEDState == 0){
-    ui8LEDState = 1;
-    vGenerateLogicLevel(4, HIGH);
-  }
-  else{
-    ui8LEDState = 0;
-    vGenerateLogicLevel(4, LOW);
-  }
-  return TASK_END;                                          // All tasks must returns anything. See the vCheckTaskReturn() function in the TaskScheduler.c file in the jOS/TaskManager/TaskScheduler directory to include more task returns.
-}
+task_t tBlink;                                      // Task handle declaration.
+void vBlink(void* vpArgs) THREAD{                   // All task functions must have this scope of function.
+  static bool bLEDState = GPIO_OUTPUT_LOW;          // Static variables never will be deleted! In a task, statics variables is almost mandatory.
+  vGenerateLogicLevel(13, bLEDState);
+  bLEDState = !bLEDState;
+  Task_delayMS(1000);                               // Pause this task for 1000ms.
+} END_THREAD
 
 /*!
   Main function.
 */
 int main(){
-  /*!
-    Memory manager initialization.
-  */
-  if (ui8MemoryManagerInit() != MEMORY_MANAGER_INITIALIZED){
-    vSystemRestart();
-  }
-  
+
   /*!
     Hardwares initialization.
   */
-  vSetPinMode(4, DIGITAL_OUTPUT);
+  vSetPinMode(13, GPIO_OUTPUT);
 
   /*!
     Tasks installations.
   */
-  uint8_t ui8TaskStatus = ui8AddTask(&tBlink,               // This parameter defines the handle of this task.
-                                     &ui8Blink,             // This parameter defines the function of this task.
-                                     "Blink",               // This parameter defines the name of this task.
-                                     NULL,                  // This parameter defines the arguments of this task.
-                                     1,                     // This parameter defines the priority of this task.
-                                     500,                   // This parameter defines the reexecution time of this task.
-                                     ABLED);                // This parameter defines whether this task will start enabled or not.
-  
-  if (ui8TaskStatus != TASK_ADDED){
-    vSystemRestart();
-  }
-   
-  /*!
-    Task manager initialization.
-  */
-  if (ui8TaskManagerInit() != TASK_MANAGER_INITIALIZED){
-    vSystemRestart();
+  task_status_t tsTaskStatus = newThread(
+    tBlink,                 // This parameter defines the handle of this task.
+    "Blink",                // This parameter defines the name of this task.
+    &vBlink,                // This parameter defines the function of this task.
+    NULL,                   // This parameter defines the arguments of this task.
+    500,                    // This parameter defines the software watchdog timeout.
+    1,                      // This parameter defines the priority of this task.
+    TASK_STATUS_ENABLED     // This parameter defines whether this task will start enabled or not.
+  );
+
+  if (tsTaskStatus != TASK_STATUS_CREATED){
+    System_restart();
   }
   
-  while(1){
+  #if !(defined(__AUTO_INITIALIZATION_ENABLE__))
+
     /*!
-      Scheduling tasks.
+      Task manager initialization.
     */
-    vStartScheduler();
-  }
+    Scheduler_setMode(SCHEDULER_MODE_ROUND_ROBIN);
+    Scheduler_enable();
+    
+    while(1){
+      /*!
+        Scheduling tasks.
+      */
+      Scheduler_start();
+    }
+
+  #endif
 }
