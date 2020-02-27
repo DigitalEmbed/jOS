@@ -8,6 +8,7 @@
   Permissions of this copyleft license are conditioned on making available
   complete source code of licensed works and modifications under the same
   license or the GNU GPLv3. Copyright and license notices must be preserved.
+  
   Contributors provide an express grant of patent rights. However, a larger
   work using the licensed work through interfaces provided by the licensed
   work may be distributed under different terms and without source code for
@@ -29,21 +30,30 @@
     -> Disclose source;
     -> State changes;
     -> Same license (library);
-
+    
   For more informations, check the LICENSE document. If you want to use a
   commercial product without having to provide the source code, send an email
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#include <GPIO.h>
-#include <UART.h>
+#include <stdint.h>
+#include <stdbool.h>
 #include <jOS.h>
+
+#define vGenerateLogicLevel(ui8Pin, bLogicLevel)
+#define vSetPinMode(ui8Pin, bMode)
+#define GPIO_MODE_OUTPUT 1
+#define GPIO_MODE_INPUT 0
+#define GPIO_OUTPUT_HIGH 1
+#define GPIO_OUTPUT_LOW 0
+#define vSerialBegin(ui32BaudRate)
+#define vSendSerial(sString1)
 
 /*!
   tTask1 task declaration and implementation.
 */
 task_t tTask1;
-uint8_t ui8Task1(void* vpArgs){
+void vTask1(void* vpArgs){
   /*!
     Pointing out to sTaskFlag switch.
   */
@@ -52,142 +62,151 @@ uint8_t ui8Task1(void* vpArgs){
   /*!
     Starting co-routine.
   */
-  CoRoutine {
+  coroutine {
     /*!
       Waiting for "semaphore".
     */
-    vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_OFF_SWITCH);
+    Task_waitFor(Switch_getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_OFF);
 
     /*!
       Executing the function when "semaphore" open.
     */
-    printf("%s: Processing A\n", tpGetCurrentTask()->cpTaskName);
+    vSendSerial("Processing A");
 
     /*!
       Returning "semaphore".
     */
-    vTurnOnSwitch(*sTaskFlag);
+    Switch_turnOn(*sTaskFlag);
 
     /*!
       Waiting for "semaphore".
     */
-    vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_OFF_SWITCH);
+    Task_waitFor(Switch_getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_OFF);
 
     /*!
       Executing the function when "semaphore" open.
     */
-    printf("%s: Processing B1\n", tpGetCurrentTask()->cpTaskName);
-    printf("%s: Processing B2\n", tpGetCurrentTask()->cpTaskName);
+    vSendSerial("Processing B1");
+    vSendSerial("Processing B2");
 
     /*!
       Returning "semaphore".
     */
-    vTurnOnSwitch(*sTaskFlag);
+    Switch_turnOn(*sTaskFlag);
 
     /*!
       Waiting for "semaphore".
     */
-    vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_OFF_SWITCH);
+    Task_waitFor(Switch_getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_OFF);
 
     /*!
       Executing the function when "semaphore" open.
     */
-    printf("%s: Processing C\n", tpGetCurrentTask()->cpTaskName);
+    vSendSerial("Processing C");
 
     /*!
       Returning "semaphore".
     */
-    vTurnOnSwitch(*sTaskFlag);
+    Switch_turnOn(*sTaskFlag);
     
   /*!
     Co-routine finalization (Without finalization, your code will not work).
   */
-  } EndCoRoutine;
+  } end_coroutine;
 }
 
 /*!
   tTask2 task declaration and implementation (Very similar to tTask1).
 */
 task_t tTask2;
-uint8_t ui8Task2(void* vpArgs){
+void vTask2(void* vpArgs) THREAD{
   static switch_t* sTaskFlag = (switch_t*) vpArgs;
-  CoRoutine {
-    vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_ON_SWITCH);
-    printf("%s: Executing A\n", tpGetCurrentTask()->cpTaskName);
-    vTurnOffSwitch(*sTaskFlag);
-    vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_ON_SWITCH);
-    printf("%s: Executing B\n", tpGetCurrentTask()->cpTaskName);
-    vTurnOffSwitch(*sTaskFlag);
-    vWaitFor(ui8GetSwitchStatus(*sTaskFlag) == TURNED_ON_SWITCH);
-    printf("%s: Executing C\n", tpGetCurrentTask()->cpTaskName);
-    vTurnOffSwitch(*sTaskFlag);
-  } EndCoRoutine;
-}
+  thread_loop {
+    Task_waitFor(Switch_getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_ON);
+    vSendSerial("Executing A");
+    Switch_turnOff(*sTaskFlag);
+    Task_waitFor(Switch_getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_ON);
+    vSendSerial("Executing B");
+    Switch_turnOff(*sTaskFlag);
+    Task_waitFor(Switch_getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_ON);
+    vSendSerial("Executing C");
+    Switch_turnOff(*sTaskFlag);
+  }
+} END_THREAD
 
 /*!
   tBlink task declaration and implementation.
 */
 task_t tBlink;
-uint8_t ui8Blink(void* vpArgs){
-  CoRoutine {
+void vBlink(void* vpArgs){
+  coroutine {
+
+    /*!
+      This code block will run once a time.
+    */
+    once{
+      vSetPinMode(13, GPIO_MODE_OUTPUT);
+    } end_once
+
     /*!
       Turning on the LED.
     */
-    vGenerateLogicLevel(13, HIGH);
+    vGenerateLogicLevel(13, GPIO_OUTPUT_LOW);
     
     /*!
       Task pausing.
     */
-    vTaskDelay(1000);
+    Task_delayMS(1000);
     
     /*!
       Turning off the LED.
     */
-    vGenerateLogicLevel(13, LOW);
+    vGenerateLogicLevel(13, GPIO_OUTPUT_HIGH);
     
     /*!
       Task pausing.
     */
-    vTaskDelay(1000);
-  } EndCoRoutine;
+    Task_delayMS(1000);
+  } end_coroutine;
 }
 
-int main(void){
+/*!
+  Main function.
+*/
+int main(){
+
   /*!
     Hardwares initialization.
   */
-  vSetPinMode(13, OUTPUT);
-  vUARTInit(9600);
-
-  /*!
-    Memory manager initialization.
-  */
-  if (ui8MemoryManagerInit() != MEMORY_MANAGER_INITIALIZED){
-    vSystemRestart();
-  }
+  vSerialBegin(9600);
 
   /*!
     tTaskFlag switch declaration.
   */
   switch_t sTaskFlag;
-  
-  /*!
-    Tasks installations.
-  */
-  ui8AddTask(&tTask1, &ui8Task1, "Task1", &sTaskFlag, 0, 100, ENABLED);
-  ui8AddTask(&tTask2, &ui8Task2, "Task2", &sTaskFlag, 0, 100, ENABLED);
-  ui8AddTask(&tBlink, &ui8Blink, "Blink", NULL, 0, 100, ENABLED);
+  newSwitch(&sTaskFlag);
 
   /*!
-    Task manager initialization.
+    Tasks installation.
   */
-  if (ui8TaskManagerInit() != TASK_MANAGER_INITIALIZED){
-    vSystemRestart();
-  }
-  while(1){
+  newTimer(tTask1, "Task1", &vTask1, &sTaskFlag, 200, 100, 1, TASK_STATUS_ENABLED);
+  newTimer(tBlink, "Blink", &vBlink, &sTaskFlag, 1000, 100, 1, TASK_STATUS_ENABLED);
+  newThread(tBlink, "Task2", &vTask2, &sTaskFlag, 100, 1, TASK_STATUS_ENABLED);
+
+  #if !(defined(__AUTO_INITIALIZATION_ENABLE__))
+
     /*!
-      Scheduling tasks.
+      Task manager initialization.
     */
-    vStartScheduler();
-  }
+    Scheduler_setMode(SCHEDULER_MODE_ROUND_ROBIN);
+    Scheduler_enable();
+    
+    while(1){
+      /*!
+        Scheduling tasks.
+      */
+      Scheduler_start();
+    }
+
+  #endif
 }
