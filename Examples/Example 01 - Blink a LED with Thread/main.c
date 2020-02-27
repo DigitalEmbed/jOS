@@ -77,6 +77,7 @@ int main(){
     NULL,                   // This parameter defines the arguments of this task.
     500,                    // This parameter defines the software watchdog timeout.
     1,                      // This parameter defines the priority of this task.
+    TASK_MODE_REPEAT,       // This parameter defines if this task will run once a time or repeatedly.
     TASK_STATUS_ENABLED     // This parameter defines whether this task will start enabled or not.
   );
 
