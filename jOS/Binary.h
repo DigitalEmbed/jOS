@@ -1,4 +1,4 @@
-//! jOS Version 2.0b
+//! jOS Version 3.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -33,21 +33,27 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Binary_H
-#define Binary_H
+#ifndef __BINARY_SEMAPHORE__
+  #define __BINARY_SEMAPHORE__
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
+  #include "./Configs.h"
 
-#include <stdint.h>
-#include "./Semaphores.h"
+  #if defined(__SEMAPHORES_MANAGER_ENABLE__) && defined(__AMOUNT_OF_SEMAPHORES__) &&\
+  defined(__MINIMUM_SEMAPHORE_TIMEOUT_MS__) && (__AMOUNT_OF_SEMAPHORES__ > 0) && (__MINIMUM_SEMAPHORE_TIMEOUT_MS__ > 0)
 
-uint8_t ui8TakeBinarySemaphore(semaphore_t* smpSemaphore);                     /*!< 8-bit integer type function. */
-uint8_t ui8ReturnBinarySemaphore(semaphore_t* smpSemaphore);                   /*!< 8-bit integer type function. */
+    #ifdef __cplusplus
+      extern "C" {
+    #endif
 
-#ifdef __cplusplus
-  }
-#endif
+    #include <stdint.h>
+    #include "./Semaphores.h"
 
+    semaphore_status_t BinarySemaphore_take(semaphore_t smSemaphore);                      /*!< semaphore_status_t integer type function. */
+    semaphore_status_t BinarySemaphore_return(semaphore_t smSemaphore);                    /*!< semaphore_status_t integer type function. */
+
+    #ifdef __cplusplus
+      }
+    #endif
+
+  #endif
 #endif

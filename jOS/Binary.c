@@ -1,37 +1,43 @@
-#include "./Binary.h"
+#include "./Configs.h"
 
-extern uint16_t ui16pResetTime[AMOUNT_OF_SEMAPHORES];
+  #if defined(__SEMAPHORES_MANAGER_ENABLE__) && defined(__AMOUNT_OF_SEMAPHORES__) &&\
+  defined(__MINIMUM_SEMAPHORE_TIMEOUT_MS__) && (__AMOUNT_OF_SEMAPHORES__ > 0) && (__MINIMUM_SEMAPHORE_TIMEOUT_MS__ > 0)
 
-//! Function: Semaphore Taker
-/*!
-  Tries take a semaphore.
-  \param smpSemaphore is a semaphore_t pointer type.
-  \return Returns TASK_HOLDER or SEMAPHORE_BUSY.
-*/
-uint8_t ui8TakeBinarySemaphore(semaphore_t* smpSemaphore){
-  if (smpSemaphore->tTaskHolder == NULL){
-    smpSemaphore->tTaskHolder = tCurrentTask;
-    smpSemaphore->ui8SemaphoreStatus = SEMAPHORE_BUSY;
-    ui16pResetTime[smpSemaphore->ui8SemaphoreAddress] = smpSemaphore->ui16ResetTime;
-  }
-  if (smpSemaphore->tTaskHolder == tCurrentTask){
-    return TASK_HOLDER;
-  }
-  return SEMAPHORE_BUSY;
-}
+  #include "./Binary.h"
 
-//! Function: Semaphore Retorner
-/*!
-  Tries return a semaphore.
-  \param smpSemaphore is a semaphore_t pointer type.
-  \return Returns RETURNED_SEMAPHORE or SEMAPHORE_BUSY.
-*/
-uint8_t ui8ReturnBinarySemaphore(semaphore_t* smpSemaphore){
-  if (smpSemaphore->tTaskHolder == tCurrentTask){
-    smpSemaphore->ui8SemaphoreStatus = SEMAPHORE_IDLE;
-    smpSemaphore->tTaskHolder = NULL;
-    ui16pResetTime[smpSemaphore->ui8SemaphoreAddress] = smpSemaphore->ui16ResetTime;
-    return RETURNED_SEMAPHORE;
+  extern uint16_t ui16pResetTime[__AMOUNT_OF_SEMAPHORES__];
+
+  //! Function: Semaphore Taker
+  /*!
+    Tries take a semaphore.
+    \param smSemaphore is a semaphore_t pointer type.
+    \return Returns TASK_HOLDER or SEMAPHORE_BUSY.
+  */
+  semaphore_status_t BinarySemaphore_take(semaphore_t smSemaphore){
+    if (smSemaphore->tTaskHolder == NULL){
+      smSemaphore->tTaskHolder = __tCurrentTask;
+      smSemaphore->smsSemaphoreStatus = SEMAPHORE_STATUS_BUSY;
+      smSemaphore->ui16TimeCounter = smSemaphore->ui16Timeout;
+    }
+    if (smSemaphore->tTaskHolder == __tCurrentTask){
+      return SEMAPHORE_STATUS_TASK_HOLDER;
+    }
+    return SEMAPHORE_STATUS_BUSY;
   }
-  return SEMAPHORE_BUSY;
-}
+
+  //! Function: Semaphore Retorner
+  /*!
+    Tries return a semaphore.
+    \param smSemaphore is a semaphore_t pointer type.
+    \return Returns RETURNED_SEMAPHORE or SEMAPHORE_BUSY.
+  */
+  semaphore_status_t BinarySemaphore_return(semaphore_t smSemaphore){
+    if (smSemaphore->tTaskHolder == __tCurrentTask){
+      smSemaphore->smsSemaphoreStatus = SEMAPHORE_STATUS_IDLE;
+      smSemaphore->tTaskHolder = NULL;
+      return SEMAPHORE_STATUS_RETURNED_SEMAPHORE;
+    }
+    return SEMAPHORE_STATUS_BUSY;
+  }
+
+#endif

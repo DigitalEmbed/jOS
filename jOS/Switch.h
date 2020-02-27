@@ -1,4 +1,4 @@
-//! jOS Version 2.0b
+//! jOS Version 3.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -33,39 +33,45 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Switch_h
-#define Switch_h
+#ifndef __SWITCH_H__
+  #define __SWITCH_H__
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
+  #include "./Configs.h"
 
-#include <stdio.h>
-#include <inttypes.h>
+  #if defined(__SWITCHES_MANAGER_ENABLE__) && defined(__AMOUNT_OF_SWITCHES__) && (__AMOUNT_OF_SWITCHES__ > 0)
 
-//! Macros: Switch Satus
-/*!
-  These macros are for facilitate the use of this library.
-*/
-#define   ERROR_SWITCH_NOT_INITIALIZED      0
-#define   SWITCH_INITIALIZED                1
+    #ifdef __cplusplus
+      extern "C" {
+    #endif
 
-#define   TURNED_OFF_SWITCH                 0
-#define   TURNED_ON_SWITCH                  1
+    #include <stdio.h>
+    #include <stdint.h>
 
-//! Type Definition: switch_t
-/*!
-  This typedef exist for organization purpose. This type is equivalent of a 8-bit unsigned integer.
-*/
-typedef uint8_t switch_t;
+    //! Type Enumeration: Switch Satus
+    /*!
+      This typedef is for facilitate the use of this library.
+    */
+    typedef enum{
+      SWITCH_STATUS_ERROR_NOT_INITIALIZED = 0,
+      SWITCH_STATUS_INITIALIZED,
+      SWITCH_STATUS_TURNED_OFF,
+      SWITCH_STATUS_TURNED_ON
+    } switch_status_t;
 
-uint8_t ui8SwitchInit(switch_t* spSwitch);          /*!< 8-bits integer type function. */
-void vTurnOnSwitch(switch_t* sSwitch);              /*!< 8-bits integer type function. */
-void vTurnOffSwitch(switch_t* sSwitch);             /*!< 8-bits integer type function. */
-uint8_t ui8GetSwitchStatus(switch_t* sSwitch);      /*!< 8-bits integer type function. */
+    //! Type Definition: switch_t
+    /*!
+      This typedef exist for organization purpose. This type is equivalent of a 8-bit unsigned integer.
+    */
+    typedef uint8_t* switch_t;
 
-#ifdef __cplusplus
-  }
-#endif
+    switch_status_t newSwitch(switch_t sSwitch);                    /*!< switch_status_t integer type function. */
+    switch_status_t Switch_turnOn(switch_t sSwitch);                /*!< switch_status_t integer type function. */
+    switch_status_t Switch_turnOff(switch_t sSwitch);               /*!< switch_status_t integer type function. */
+    switch_status_t Switch_getStatus(switch_t sSwitch);             /*!< switch_status_t integer type function. */
 
+    #ifdef __cplusplus
+      }
+    #endif
+
+  #endif
 #endif

@@ -1,55 +1,60 @@
-#include "./Switch.h"
-
 #include "./Configs.h"
-#include <EmbeddedTools.h>
 
-//! Bit Vector: Switch
-/*!
-  This bit vector is for managing switches positions in the switch manager.
-*/
-xCreateBitVector(bvSwitches, AMOUNT_OF_SWITCHES);
+#if defined(__SWITCHES_MANAGER_ENABLE__) && defined(__AMOUNT_OF_SWITCHES__) && (__AMOUNT_OF_SWITCHES__ > 0)
 
-//! Function: Switch Initializer
-/*!
-  Initializes a Switch.
-  \param sSwitch is a switch_t pointer type.
-  \return Returns ERROR_SWITCH_NOT_INITIALIZED or SWITCH_INITIALIZED.
-*/
-uint8_t ui8SwitchInit(switch_t* spSwitch){
-  static uint8_t ui8SwitchCounter = 0;
-  if (ui8SwitchCounter >= AMOUNT_OF_SWITCHES){
-    return ERROR_SWITCH_NOT_INITIALIZED;
+  #include "./Switch.h"
+  #include <EmbeddedTools.h>
+  #include <MemoryManager.h>
+
+  //! Bit Vector: Switch
+  /*!
+    This bit vector is for managing switches positions in the switch manager.
+  */
+  newBitVector(bvSwitches, __AMOUNT_OF_SEMAPHORES__);
+
+  //! Function: Switch Initializer
+  /*!
+    Initializes a Switch.
+    \param sSwitch is a switch_t pointer type.
+    \return Returns ERROR_SWITCH_NOT_INITIALIZED or SWITCH_INITIALIZED.
+  */
+  switch_status_t newSwitch(switch_t spSwitch){
+    static uint8_t ui8SwitchCounter = 0;
+    if (ui8SwitchCounter >= __AMOUNT_OF_SEMAPHORES__){
+      return SWITCH_STATUS_ERROR_NOT_INITIALIZED;
+    }
+    *spSwitch = ui8SwitchCounter;
+    BitVector_clearBit(bvSwitches, ui8SwitchCounter);
+    ui8SwitchCounter++;
+    return SWITCH_STATUS_INITIALIZED;
   }
-  *spSwitch = ui8SwitchCounter;
-  vEraseBitVector(bvSwitches, ui8SwitchCounter);
-  ui8SwitchCounter++;
-  return SWITCH_INITIALIZED;
-}
 
-//! Function: Turn On Switch
-/*!
-  Turns on a Switch.
-  \param sSwitch is a switch_t type.
-*/
-void vTurnOnSwitch(switch_t* sSwitch){
-  vSetBitVector(bvSwitches, *(sSwitch));
-}
+  //! Function: Turn On Switch
+  /*!
+    Turns on a Switch.
+    \param sSwitch is a switch_t type.
+  */
+  void vTurnOnSwitch(switch_t sSwitch){
+    BitVector_setBit(bvSwitches, *(sSwitch));
+  }
 
-//! Function: Turn Off Switch
-/*!
-  Turns off a Switch.
-  \param sSwitch is a switch_t type.
-*/
-void vTurnOffSwitch(switch_t* sSwitch){
-  vEraseBitVector(bvSwitches, *(sSwitch));
-}
+  //! Function: Turn Off Switch
+  /*!
+    Turns off a Switch.
+    \param sSwitch is a switch_t type.
+  */
+  void vTurnOffSwitch(switch_t sSwitch){
+    BitVector_clearBit(bvSwitches, *(sSwitch));
+  }
 
-//! Function: Switch Status Getter
-/*!
-  Gets a Switch status.
-  \param sSwitch is a switch_t type.
-  \return Returns BUSY or NOT_BUSY.
-*/
-uint8_t ui8GetSwitchStatus(switch_t* sSwitch){
-  return ui8ReadBitVector(bvSwitches, *(sSwitch));
-}
+  //! Function: Switch Status Getter
+  /*!
+    Gets a Switch status.
+    \param sSwitch is a switch_t type.
+    \return Returns BUSY or NOT_BUSY.
+  */
+  switch_status_t ui8GetSwitchStatus(switch_t sSwitch){
+    return (BitVector_readBit(bvSwitches, *(sSwitch))) == 1 ? SWITCH_STATUS_TURNED_ON : SWITCH_STATUS_TURNED_OFF;
+  }
+
+#endif

@@ -1,4 +1,4 @@
-//! jOS Version 2.0b
+//! jOS Version 3.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -33,64 +33,71 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Semaphores_h
-#define Semaphores_h
+#ifndef __SEMAPHORES_H__
+  #define __SEMAPHORES_H__
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
+  #include "./Configs.h"
 
-#include <stdio.h>
-#include <inttypes.h>
-#include "./Configs.h"
-#include "./TaskScheduler.h"
+  #if defined(__SEMAPHORES_MANAGER_ENABLE__) && defined(__AMOUNT_OF_SEMAPHORES__) &&\
+  defined(__MINIMUM_SEMAPHORE_TIMEOUT_MS__) && (__AMOUNT_OF_SEMAPHORES__ > 0) && (__MINIMUM_SEMAPHORE_TIMEOUT_MS__ > 0)
 
-//! Macros: Semaphore Satus
-/*!
-  These macros are for facilitate the use of this library.
-*/
-#define   BINARY                            0
-#define   COUNTING                          1
-#define   MUTEX                             2
+    #ifdef __cplusplus
+      extern "C" {
+    #endif
+  
+    #include <stdio.h>
+    #include <inttypes.h>
+    #include "./Task.h"
+    #include "./Scheduler.h"
 
-#define   SEMAPHORE_IDLE                    10
-#define   SEMAPHORE_BUSY                    11
+    //! Type Enumeration: Semaphore Type
+    /*!
+      These macros are for facilitate the use of this library.
+    */
+    typedef enum {
+      SEMAPHORE_TYPE_BINARY = 0,
+      SEMAPHORE_TYPE_COUNTING,
+      SEMAPHORE_TYPE_MUTEX
+    } semaphore_type_t;
 
-#define   TAKED_SEMAPHORE                   21
-#define   RETURNED_SEMAPHORE                22
-#define   TASK_HOLDER                       23
-#define   TASK_NOT_HOLDER                   24
+    //! Type Enumeration: Semaphore Status
+    /*!
+      These macros are for facilitate the use of this library.
+    */
+    typedef enum {
+      SEMAPHORE_STATUS_EMPTY = 0,
+      SEMAPHORE_STATUS_CREATED,
+      SEMAPHORE_STATUS_ERROR,
+      SEMAPHORE_STATUS_RETURNED_SEMAPHORE,
+      SEMAPHORE_STATUS_TASK_HOLDER,
+      SEMAPHORE_STATUS_IDLE,
+      SEMAPHORE_STATUS_BUSY
+    } semaphore_status_t;
 
-#define   SEMAPHORE_INITIALIZED             40
-#define   SEMAPHORE_NOT_INITIALIZED         41
-#define   NO_SUCH_MEMORY_FOR_SEMAPHORE      42
-#define   TASK_SCHEDULED                    43
-#define   TASK_SCHEDULED_NOT_REMOVED        44
-#define   MUTEX_NOT_POSSIBLE                45
-#define   TASK_BUFFER_NEEDLESS              46
-#define   TASK_PERIOD_CHANGE_ERROR          47
-#define   TASK_PRIORITY_CHANGE_ERROR        48
-#define   TASK_EXECUTION_CHANGE_ERROR       49
+    //! Type Definition: Semaphore Structure
+    /*!
+      This typedef exist for organization purpose.
+    */
+    typedef struct {
+      semaphore_status_t smsSemaphoreStatus;
+      semaphore_type_t smtSemaphoreType;
+      uint16_t ui16Timeout;
+      uint16_t ui16TimeCounter;
+      task_t tTaskHolder;
+    } semaphore_structure_t;
 
-//! Type Definition: semaphore_t
-/*!
-  This typedef exist for organization purpose.
-*/
-typedef struct {
-  uint8_t ui8SemaphoreStatus;
-  uint8_t ui8SemaphoreType;
-  uint8_t ui8SemaphoreAddress;
-  uint16_t ui16ResetTime;
-  task_t tTaskHolder;
-} semaphore_t;
+    typedef semaphore_structure_t* semaphore_t;
 
-void vSemaphoreManagerInit(void);                                                                           /*!< void type function. */
-uint8_t ui8CreateSemaphore(semaphore_t* smpSemaphore, uint8_t ui8SemaphoreType, uint16_t ui16ResetTime);    /*!< 8-bits integer type function. */
-uint8_t ui8TakeSemaphore(semaphore_t* smpSemaphore);                                                        /*!< 8-bits integer type function. */
-uint8_t ui8ReturnSemaphore(semaphore_t* smpSemaphore);                                                      /*!< 8-bits integer type function. */
+    semaphore_status_t newSemaphore(semaphore_t* smSemaphore, semaphore_type_t smtSemaphoreType, uint16_t ui16Timeout);     /*!< semaphore_status_t type function. */
+    semaphore_status_t Semaphore_take(semaphore_t smSemaphore);                                                             /*!< semaphore_status_t type function. */
+    semaphore_status_t Semaphore_return(semaphore_t smSemaphore);                                                           /*!< semaphore_status_t type function. */
+    void Semaphore_initWatchdog(void);                                                                                      /*!< void type function. */
+    void Semaphore_attachWatchdogCallback(void (*vfWatchdogCallback)(void*), void* vpWatchdogCallbackArguments);            /*!< void type function. */
+    void Semaphore_detachWatchdogCallback(void);                                                                            /*!< void type function. */
 
-#ifdef __cplusplus
-  }
-#endif
+    #ifdef __cplusplus
+      }
+    #endif
 
+  #endif  
 #endif

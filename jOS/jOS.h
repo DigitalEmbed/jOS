@@ -1,4 +1,4 @@
-//! jOS Version 2.0b
+//! jOS Version 3.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -33,8 +33,8 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef jOS_H
-#define jOS_H
+#ifndef __JOS_H__
+#define __JOS_H__
 
 #ifdef __cplusplus
   extern "C" {
@@ -61,8 +61,9 @@
 /*!
   Path to jOS system task manager libraries.
 */
-#include "./TaskScheduler.h"
-#include "./CoRoutines.h"
+#include "./Task.h"
+#include "./Scheduler.h"
+#include "./Coroutines.h"
 #include "./Switch.h"
 #include "./Semaphores.h"
 
