@@ -8,6 +8,7 @@
   Permissions of this copyleft license are conditioned on making available
   complete source code of licensed works and modifications under the same
   license or the GNU GPLv3. Copyright and license notices must be preserved.
+  
   Contributors provide an express grant of patent rights. However, a larger
   work using the licensed work through interfaces provided by the licensed
   work may be distributed under different terms and without source code for
@@ -35,9 +36,12 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
+#include <stdint.h>
+#include <stdbool.h>
 #include <jOS.h>
-#include <PWM.h>
-#include <ADC.h>
+
+#define ui16AnalogRead(ui8Pin) 0
+#define vGeneratePWM(ui8Pin, ui8Value)
 
 #define PREVIOUS  0
 #define ACTUAL    1
@@ -46,48 +50,29 @@
   Tasks declarations.
 */
 task_t tAnalogRead;                                                     // Task handle declaration.
-uint8_t ui8AnalogRead(void *vpArgs){                                    // All task functions must have this scope of function.
+void vAnalogRead(void *vpArgs){                                         // All task functions must have this scope of function.
   if (vpArgs != NULL){                                                  // Checking whether the argument exists
     static uint16_t* ui16pAnalogValue = (uint16_t*) vpArgs;
     ui16pAnalogValue[PREVIOUS] = ui16pAnalogValue[ACTUAL];
-    ui16pAnalogValue[ACTUAL] = ui16AnalogRead(5);
+    ui16pAnalogValue[ACTUAL] = ui16AnalogRead(0);
     if (ui16pAnalogValue[PREVIOUS] != ui16pAnalogValue[ACTUAL]){
-      if (ui8EnableTask(tpFindTask("GeneratePWM")) != TASK_ENABLED){    // "GeneratePWM" task enabling...
-        return SYSTEM_RESTART;                                          // If "GeneratePWM" task not exist, restart the system.
-      }
+      Task_enable(Task_find("PWM"));                                    // "GeneratePWM" task enabling...
     }
   }
-  return TASK_END;                                                      // The system will sleep until the next instruction.
 }
 
-task_t tGeneratePWM;                                                    // Task handle declaration.
-uint8_t ui8GeneratePWM(void* vpArgs){                                   // All task functions must have this scope of function.
+task_t tUpdatePWM;                                                      // Task handle declaration.
+void vUpdatePWM(void* vpArgs){                                          // All task functions must have this scope of function.
   if (vpArgs != NULL){                                                  // Checking whether the argument exists
     static uint16_t* ui16pPWMValue = (uint16_t*) vpArgs;
-    vGeneratePWM(6, ui16pPWMValue[ACTUAL]);
+    vGeneratePWM(6, (ui16pPWMValue[ACTUAL] >> 2));                      
   }
-  if (ui8DisableTask(tpGetCurrentTask()) != TASK_DISABLED){
-    return SYSTEM_RESTART;                                              // Restart the system if is not possible self disable...
-  }
-  return TASK_END;                                                      // The system will sleep until the next instruction.
 }
 
 /*!
   Main function.
 */
 int main(){
-  /*!
-    Memory manager initialization.
-  */
-  if (ui8MemoryManagerInit() != MEMORY_MANAGER_INITIALIZED){
-    vSystemRestart();
-  }
-  
-  /*!
-    Hardwares initialization.
-  */
-  vSetPinMode(5, ANALOG_INPUT);
-  vSetPinMode(6, PWM);
 
   /*!
     Variables allocation.
@@ -95,26 +80,25 @@ int main(){
   uint16_t ui16pSharedVariable[2] = {0};
 
   /*!
-    Tasks installations.
+    Tasks installation.
   */
-  if (ui8AddTask(&tAnalogRead, &ui8AnalogRead, "AnalogRead", &ui16pSharedVariable, 1, 100, ABLED) != TASK_ADDED){
-    vSystemRestart();
-  }  
-  if (ui8AddTask(&tGeneratePWM, &ui8GeneratePWM, "GeneratePWM", &ui16pSharedVariable, 1, 50, UNABLED) != TASK_ADDED){
-    vSystemRestart();
-  }
+  newTimer(tAnalogRead, "ADC", &vAnalogRead, &ui16pSharedVariable, 100, 500, 2, TASK_MODE_REPEAT, TASK_STATUS_ENABLED);
+  newTimer(tUpdatePWM, "PWM", &vUpdatePWM, &ui16pSharedVariable, 10, 100, 1, TASK_MODE_RUN_ONCE, TASK_STATUS_ENABLED);
 
- /*!
-   Task manager initialization.
- */
-  if (ui8TaskManagerInit() != TASK_MANAGER_INITIALIZED){
-    vSystemRestart();
-  }
-  
-  while(1){
+  #if !(defined(__AUTO_INITIALIZATION_ENABLE__))
+
     /*!
-      Scheduling tasks.
+      Task manager initialization.
     */
-    vStartScheduler();
-  }
+    Scheduler_setMode(SCHEDULER_MODE_ROUND_ROBIN);
+    Scheduler_enable();
+    
+    while(1){
+      /*!
+        Scheduling tasks.
+      */
+      Scheduler_start();
+    }
+
+  #endif
 }
