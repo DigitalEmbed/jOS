@@ -1,4 +1,4 @@
-//! Example 03 - Co-routines, threads, switches and another way to blink a LED
+//! Example 04 - Co-routines, threads, switches and another way to blink a LED
 /*!
   This simply example demonstrates how to share a variable between tasks.
 
