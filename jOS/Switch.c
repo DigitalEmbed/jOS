@@ -18,7 +18,7 @@
     \param swSwitch is a switch_t pointer type.
     \return Returns ERROR_SWITCH_NOT_INITIALIZED or SWITCH_INITIALIZED.
   */
-  switch_status_t newSwitch(switch_t* swSwitch){
+  switch_status_t (newSwitch)(switch_t* swSwitch){
     static uint8_t ui8SwitchCounter = 0;
     if (ui8SwitchCounter >= __AMOUNT_OF_SEMAPHORES__){
       return SWITCH_STATUS_ERROR_NOT_INITIALIZED;

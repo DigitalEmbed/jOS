@@ -87,8 +87,8 @@ defined(__MINIMUM_SEMAPHORE_TIMEOUT_MS__) && (__AMOUNT_OF_SEMAPHORES__ > 0) && (
     \param smtSemaphoreType is a 8-bit integer.
     \return Returns NO_SUCH_MEMORY_FOR_SEMAPHORE or SEMAPHORE_INITIALIZED.
   */
-  semaphore_status_t newSemaphore(semaphore_t* smSemaphore, semaphore_type_t smtSemaphoreType, uint16_t ui16Timeout){
-    if (__ui8AmountOfSemaphores >= __AMOUNT_OF_SEMAPHORES__ || __smwWatchdogStatus == SEMAPHORE_WATCHDOG_STATUS_DISABLED){
+  semaphore_status_t (newSemaphore)(semaphore_t* smSemaphore, semaphore_type_t smtSemaphoreType, uint16_t ui16Timeout){
+    if (__ui8AmountOfSemaphores >= __AMOUNT_OF_SEMAPHORES__){
       return SEMAPHORE_STATUS_ERROR;
     }
     __smSemaphoresVector[__ui8AmountOfSemaphores].smsSemaphoreStatus = SEMAPHORE_STATUS_IDLE;

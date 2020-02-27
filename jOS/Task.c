@@ -33,7 +33,7 @@ defined(__SCHEDULER_DEFAULT_MODE__) && (__SCHEDULER_DEFAULT_MODE__ >= SCHEDULER_
     \param tsStatus is a 8-bit integer type. Put "ENABLE" on this argument if you want this task starts enabled or "TASK_STATUS_DISABLED" in contrary case.
     \return Returns created task pointer.
   */
-  task_status_t newTask(task_t* tTask, const char* cpTaskName, void (*vfTaskFunction)(void*), void* vpArguments, uint16_t ui16Period, uint16_t ui16Timeout, uint8_t ui8Priority, task_status_t tsStatus){
+  task_status_t newTask(task_t* tTask, const char* cpTaskName, void (*vfTaskFunction)(void*), void* vpArguments, uint16_t ui16Period, uint16_t ui16Timeout, uint8_t ui8Priority, task_mode_t tmMode, task_status_t tsStatus){
     uint8_t ui8Counter = 0;
     uint8_t ui8VirtualAddress = 0;
     uint8_t __ssSchedulerStatusBuffer = __ssSchedulerStatus;
@@ -62,6 +62,7 @@ defined(__SCHEDULER_DEFAULT_MODE__) && (__SCHEDULER_DEFAULT_MODE__ >= SCHEDULER_
     (*tTask)->vfTaskFunction = vfTaskFunction;
     (*tTask)->vpArguments = vpArguments;
     (*tTask)->tsStatus = tsStatus;
+    (*tTask)->tmTaskMode = tmMode;
     (*tTask)->ui8RealAddress = __ui8EmptyTaskPosition;
     (*tTask)->ui16Timeout = (ui16Timeout > (__MINIMUM_TASK_TIMEOUT_MS__)) ? (ui16Timeout/__ui8TaskTickMS) : ((__MINIMUM_TASK_TIMEOUT_MS__)/__ui8TaskTickMS);
     if (ui16Period == COOPERATIVE_MODE){
@@ -285,7 +286,7 @@ defined(__SCHEDULER_DEFAULT_MODE__) && (__SCHEDULER_DEFAULT_MODE__ >= SCHEDULER_
     \param cpTaskName is a char pointer type. This is the name of task.
     \return Returns the pointer of task or NULL if the task don't exist.
   */
-  task_t tFindTask(const char* cpTaskName){
+  task_t Task_find(const char* cpTaskName){
     uint8_t ui8Counter = 0;
     if (cpTaskName == NULL){
       return NULL;

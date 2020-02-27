@@ -86,9 +86,16 @@
       task_t tTaskHolder;
     } semaphore_structure_t;
 
+    //! Type Definition: Semaphore Structure Pointer
+    /*!
+      This typedef exist for organization purpose.
+    */
     typedef semaphore_structure_t* semaphore_t;
 
-    semaphore_status_t newSemaphore(semaphore_t* smSemaphore, semaphore_type_t smtSemaphoreType, uint16_t ui16Timeout);     /*!< semaphore_status_t type function. */
+    #define newSemaphore(smSemaphore, smtSemaphoreType, ui16Timeout)\
+      newSemaphore(&smSemaphore, smtSemaphoreType, ui16Timeout)
+
+    semaphore_status_t (newSemaphore)(semaphore_t* smSemaphore, semaphore_type_t smtSemaphoreType, uint16_t ui16Timeout);   /*!< semaphore_status_t type function. */
     semaphore_status_t Semaphore_take(semaphore_t smSemaphore);                                                             /*!< semaphore_status_t type function. */
     semaphore_status_t Semaphore_return(semaphore_t smSemaphore);                                                           /*!< semaphore_status_t type function. */
     void Semaphore_initWatchdog(void);                                                                                      /*!< void type function. */

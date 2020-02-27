@@ -64,7 +64,16 @@
     */
     typedef uint8_t switch_t;
 
-    switch_status_t newSwitch(switch_t* swSwitch);                  /*!< switch_status_t integer type function. */
+    //! Function: Switch Initializer
+    /*!
+      Initializes a Switch.
+      \param swSwitch is a switch_t type.
+      \return Returns ERROR_SWITCH_NOT_INITIALIZED or SWITCH_INITIALIZED.
+    */
+    #define newSwitch(swSwitch)\
+      newSwitch(&swSwitch)
+
+    switch_status_t (newSwitch)(switch_t* swSwitch);                /*!< switch_status_t integer type function. */
     switch_status_t Switch_getStatus(switch_t swSwitch);            /*!< switch_status_t integer type function. */
     void Switch_turnOn(switch_t swSwitch);                          /*!< switch_status_t integer type function. */
     void Switch_turnOff(switch_t swSwitch);                         /*!< switch_status_t integer type function. */

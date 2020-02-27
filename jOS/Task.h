@@ -74,6 +74,15 @@
       TASK_STATUS_ERROR
     } task_status_t;
 
+    //! Type Enumeration: Task Mode
+    /*!
+      These macros are for facilitate the use of this library.
+    */
+    typedef enum {
+      TASK_MODE_RUN_ONCE = 0,
+      TASK_MODE_REPEAT
+    } task_mode_t;
+
     //! Macros: Cooperative Mode
     /*!
       This macros is for facilitate the use of this library.
@@ -85,19 +94,20 @@
       This typedef exist for organization purpose.
     */
     typedef struct {
-      void (*vfTaskFunction)(void*);                                                                                                                                                /*!< void function pointer type. */
-      void* vpArguments;                                                                                                                                                            /*!< void pointer type. */
-      char cpTaskName[__TASK_NAME_SIZE__];                                                                                                                                          /*!< char pointer type. */
-      task_type_t ttTaskType;                                                                                                                                                       /*!< 8-bit integer type. */
-      task_status_t tsStatus;                                                                                                                                                       /*!< 8-bit integer type. */
-      uint8_t ui8RealAddress;                                                                                                                                                       /*!< 8-bit integer type. */
-      uint8_t ui8VirtualAddress;                                                                                                                                                    /*!< 8-bit integer type. */
-      uint8_t ui8Priority;                                                                                                                                                          /*!< 8-bit integer type. */
-      uint16_t ui16StartLine;                                                                                                                                                       /*!< 16-bit integer type. */
-      uint16_t ui16Line;                                                                                                                                                            /*!< 16-bit integer type. */
-      uint16_t ui16Period;                                                                                                                                                          /*!< 16-bit integer type. */
-      uint16_t ui16Timeout;                                                                                                                                                         /*!< 16-bit integer type. */
-      uint16_t ui16TimeCounter;                                                                                                                                                     /*!< 16-bit integer type. */
+      void (*vfTaskFunction)(void*);                                               /*!< void function pointer type. */
+      void* vpArguments;                                                           /*!< void pointer type. */
+      char cpTaskName[__TASK_NAME_SIZE__];                                         /*!< char pointer type. */
+      task_type_t ttTaskType;                                                      /*!< task_type_t type. */
+      task_mode_t tmTaskMode;                                                      /*!< task_mode_t type. */
+      task_status_t tsStatus;                                                      /*!< task_status_t type. */
+      uint8_t ui8RealAddress;                                                      /*!< 8-bit integer type. */
+      uint8_t ui8VirtualAddress;                                                   /*!< 8-bit integer type. */
+      uint8_t ui8Priority;                                                         /*!< 8-bit integer type. */
+      uint16_t ui16StartLine;                                                      /*!< 16-bit integer type. */
+      uint16_t ui16Line;                                                           /*!< 16-bit integer type. */
+      uint16_t ui16Period;                                                         /*!< 16-bit integer type. */
+      uint16_t ui16Timeout;                                                        /*!< 16-bit integer type. */
+      uint16_t ui16TimeCounter;                                                    /*!< 16-bit integer type. */
     } task_handler_t;
 
     //! Type Definition: task_t
@@ -118,7 +128,7 @@
       \return Returns the object.
     */
     #define newThread(tTask, cpTaskName, vfTaskFunction, vpArguments, ui16Timeout, ui8Priority, tsStatus)\
-      newTask(&tTask, cpTaskName, vfTaskFunction, vpArguments, COOPERATIVE_MODE, ui16Timeout, ui8Priority, tsStatus);
+      newTask(&tTask, cpTaskName, vfTaskFunction, vpArguments, COOPERATIVE_MODE, ui16Timeout, ui8Priority, TASK_MODE_REPEAT, tsStatus);
 
     //! Macro: Timer Creator
     /*!
@@ -132,22 +142,22 @@
       \param tsStatus is a 8-bit unsigned integer. It's the task start status (ENABLED or DISABLED).
       \return Returns the object.
     */
-    #define newTimer(tTask, cpTaskName, vfTaskFunction, vpArguments, ui16Period, ui16Timeout, ui8Priority, tsStatus)\
-      newTask(&tTask, cpTaskName, vfTaskFunction, vpArguments, ui16Period, ui16Timeout, ui8Priority, tsStatus);
+    #define newTimer(tTask, cpTaskName, vfTaskFunction, vpArguments, ui16Period, ui16Timeout, ui8Priority, tmMode, tsStatus)\
+      newTask(&tTask, cpTaskName, vfTaskFunction, vpArguments, ui16Period, ui16Timeout, ui8Priority, tmMode, tsStatus);
 
-    task_status_t newTask(task_t* tTask, const char* cpTaskName, void (*vfTaskFunction)(void*), void* vpArguments, uint16_t ui16Period, uint16_t ui16Timeout, uint8_t ui8Priority, task_status_t tsStatus);       /*!< task_t type. */
-    task_t Task_find(const char* cpTaskName);                                                                                                                                                                     /*!< task_t type. */
-    void Task_disable(task_t tTask);                                                                                                                                                                              /*!< void type. */
-    void Task_enable(task_t tTask);                                                                                                                                                                               /*!< void type. */
-    void Task_forceExecution(task_t tTask);                                                                                                                                                                       /*!< void type. */
-    void Task_restartTimer(task_t tTask);                                                                                                                                                                         /*!< void type. */
-    void Task_setArguments(task_t tTask, void* vpArguments);                                                                                                                                                      /*!< void type. */
-    void Task_setPeriod(task_t tTask, uint16_t ui16Period);                                                                                                                                                       /*!< void type. */
-    void Task_setPriority(task_t tTask, uint8_t ui8Priority);                                                                                                                                                     /*!< void type. */
-    void* Task_getArguments(task_t tTask);                                                                                                                                                                        /*!< void type. */
+    task_status_t newTask(task_t* tTask, const char* cpTaskName, void (*vfTaskFunction)(void*), void* vpArguments, uint16_t ui16Period, uint16_t ui16Timeout, uint8_t ui8Priority, task_mode_t tmMode, task_status_t tsStatus);       /*!< task_status_t type. */
+    task_t Task_find(const char* cpTaskName);                                                                                                                                                                                         /*!< task_t type. */
+    void Task_disable(task_t tTask);                                                                                                                                                                                                  /*!< void type. */
+    void Task_enable(task_t tTask);                                                                                                                                                                                                   /*!< void type. */
+    void Task_forceExecution(task_t tTask);                                                                                                                                                                                           /*!< void type. */
+    void Task_restartTimer(task_t tTask);                                                                                                                                                                                             /*!< void type. */
+    void Task_setArguments(task_t tTask, void* vpArguments);                                                                                                                                                                          /*!< void type. */
+    void Task_setPeriod(task_t tTask, uint16_t ui16Period);                                                                                                                                                                           /*!< void type. */
+    void Task_setPriority(task_t tTask, uint8_t ui8Priority);                                                                                                                                                                         /*!< void type. */
+    void* Task_getArguments(task_t tTask);                                                                                                                                                                                            /*!< void type. */
 
     #if defined(__TASK_DESTRUCTOR_ENABLE__)
-      void deleteTask(task_t tTask);                                                                                                                                                                              /*!< void type. */
+      void deleteTask(task_t tTask);                                                                                                                                                                                                  /*!< void type. */
     #endif
 
     #ifdef __cplusplus

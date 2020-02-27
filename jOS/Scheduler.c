@@ -129,10 +129,17 @@ defined(__SCHEDULER_DEFAULT_MODE__) && (__SCHEDULER_DEFAULT_MODE__ >= SCHEDULER_
               __tCurrentTask->vfTaskFunction(__tCurrentTask->vpArguments);
               System_disableHardwareWatchdog();
             }
-            if (__tCurrentTask->tsStatus == TASK_STATUS_RUNNING){
-              __tCurrentTask->tsStatus = (__tCurrentTask->ui16TimeCounter >= __tCurrentTask->ui16Period) ? (TASK_STATUS_READY) : (TASK_STATUS_ENABLED);
+            if (__tCurrentTask->tmTaskMode == TASK_MODE_REPEAT){
+              if (__tCurrentTask->tsStatus == TASK_STATUS_RUNNING){
+                __tCurrentTask->tsStatus = (__tCurrentTask->ui16TimeCounter >= __tCurrentTask->ui16Period) ? (TASK_STATUS_READY) : (TASK_STATUS_ENABLED);
+                __ssSchedulerStatus = SCHEDULER_STATUS_PAUSED;
+                __ui8ReadyTaskCounter = (__tCurrentTask->tsStatus == TASK_STATUS_READY) ? (__ui8ReadyTaskCounter + 1) : __ui8ReadyTaskCounter;
+                __ssSchedulerStatus = SCHEDULER_STATUS_RUNNING;
+              }
+            }
+            else{
               __ssSchedulerStatus = SCHEDULER_STATUS_PAUSED;
-              __ui8ReadyTaskCounter = (__tCurrentTask->tsStatus == TASK_STATUS_READY) ? (__ui8ReadyTaskCounter + 1) : __ui8ReadyTaskCounter;
+              __tCurrentTask->tsStatus = TASK_STATUS_DISABLED;
               __ssSchedulerStatus = SCHEDULER_STATUS_RUNNING;
             }
           }
