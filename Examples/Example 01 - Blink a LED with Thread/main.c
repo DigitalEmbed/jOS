@@ -50,7 +50,7 @@
   Tasks declarations.
 */
 task_t tBlink;                                      // Task handle declaration.
-void vBlink(void* vpArgs) THREAD{                   // All task functions must have this scope of function.
+void vBlink(void* vpArgs) THREAD {                  // All task functions must have this scope of function.
   static bool bLEDState = GPIO_OUTPUT_LOW;          // Static variables never will be deleted! In a task, statics variables is almost mandatory.
   vGenerateLogicLevel(13, bLEDState);
   bLEDState = !bLEDState;
