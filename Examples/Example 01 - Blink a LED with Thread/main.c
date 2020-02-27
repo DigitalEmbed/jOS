@@ -41,8 +41,8 @@
 
 #define vGenerateLogicLevel(ui8Pin, bLogicLevel)
 #define vSetPinMode(ui8Pin, bMode)
-#define GPIO_OUTPUT 1
-#define GPIO_INPUT 0
+#define GPIO_MODE_OUTPUT 1
+#define GPIO_MODE_INPUT 0
 #define GPIO_OUTPUT_HIGH 1
 #define GPIO_OUTPUT_LOW 0
 
@@ -65,7 +65,7 @@ int main(){
   /*!
     Hardwares initialization.
   */
-  vSetPinMode(13, GPIO_OUTPUT);
+  vSetPinMode(13, GPIO_MODE_OUTPUT);
 
   /*!
     Tasks installations.
