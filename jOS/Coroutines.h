@@ -98,7 +98,7 @@
     This macro pauses a coroutine block/thread in a void function in a time period.
     \param ui16TimeMS is a 16-bits unsigned integer. It's the time period that the function will be paused.
   */
-  #define Task_delay(ui16TimeMS)\
+  #define Task_delayMS(ui16TimeMS)\
     __ui16TaskPeriodBackup = __tCurrentTask->ui16Period ;\
     Task_setPeriod(NULL, ((ui16TimeMS) < __ui8TaskTickMS ? __ui8TaskTickMS : (ui16TimeMS - __ui8TaskTickMS)));\
     __tCurrentTask->ui16Line = __LINE__ ; __ui8TaskYield = 1 ; return ; case __LINE__:\

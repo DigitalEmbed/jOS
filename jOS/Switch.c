@@ -15,15 +15,15 @@
   //! Function: Switch Initializer
   /*!
     Initializes a Switch.
-    \param sSwitch is a switch_t pointer type.
+    \param swSwitch is a switch_t pointer type.
     \return Returns ERROR_SWITCH_NOT_INITIALIZED or SWITCH_INITIALIZED.
   */
-  switch_status_t newSwitch(switch_t spSwitch){
+  switch_status_t newSwitch(switch_t* swSwitch){
     static uint8_t ui8SwitchCounter = 0;
     if (ui8SwitchCounter >= __AMOUNT_OF_SEMAPHORES__){
       return SWITCH_STATUS_ERROR_NOT_INITIALIZED;
     }
-    *spSwitch = ui8SwitchCounter;
+    *swSwitch = ui8SwitchCounter;
     BitVector_clearBit(bvSwitches, ui8SwitchCounter);
     ui8SwitchCounter++;
     return SWITCH_STATUS_INITIALIZED;
@@ -32,29 +32,29 @@
   //! Function: Turn On Switch
   /*!
     Turns on a Switch.
-    \param sSwitch is a switch_t type.
+    \param swSwitch is a switch_t type.
   */
-  void vTurnOnSwitch(switch_t sSwitch){
-    BitVector_setBit(bvSwitches, *(sSwitch));
+  void Switch_turnOn(switch_t swSwitch){
+    BitVector_setBit(bvSwitches, swSwitch);
   }
 
   //! Function: Turn Off Switch
   /*!
     Turns off a Switch.
-    \param sSwitch is a switch_t type.
+    \param swSwitch is a switch_t type.
   */
-  void vTurnOffSwitch(switch_t sSwitch){
-    BitVector_clearBit(bvSwitches, *(sSwitch));
+  void Switch_turnOff(switch_t swSwitch){
+    BitVector_clearBit(bvSwitches, swSwitch);
   }
 
   //! Function: Switch Status Getter
   /*!
     Gets a Switch status.
-    \param sSwitch is a switch_t type.
+    \param swSwitch is a switch_t type.
     \return Returns BUSY or NOT_BUSY.
   */
-  switch_status_t ui8GetSwitchStatus(switch_t sSwitch){
-    return (BitVector_readBit(bvSwitches, *(sSwitch))) == 1 ? SWITCH_STATUS_TURNED_ON : SWITCH_STATUS_TURNED_OFF;
+  switch_status_t Switch_getStatus(switch_t swSwitch){
+    return (BitVector_readBit(bvSwitches, swSwitch)) == 1 ? SWITCH_STATUS_TURNED_ON : SWITCH_STATUS_TURNED_OFF;
   }
 
 #endif

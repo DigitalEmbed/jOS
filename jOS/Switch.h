@@ -62,12 +62,12 @@
     /*!
       This typedef exist for organization purpose. This type is equivalent of a 8-bit unsigned integer.
     */
-    typedef uint8_t* switch_t;
+    typedef uint8_t switch_t;
 
-    switch_status_t newSwitch(switch_t sSwitch);                    /*!< switch_status_t integer type function. */
-    switch_status_t Switch_turnOn(switch_t sSwitch);                /*!< switch_status_t integer type function. */
-    switch_status_t Switch_turnOff(switch_t sSwitch);               /*!< switch_status_t integer type function. */
-    switch_status_t Switch_getStatus(switch_t sSwitch);             /*!< switch_status_t integer type function. */
+    switch_status_t newSwitch(switch_t* swSwitch);                  /*!< switch_status_t integer type function. */
+    switch_status_t Switch_getStatus(switch_t swSwitch);            /*!< switch_status_t integer type function. */
+    void Switch_turnOn(switch_t swSwitch);                          /*!< switch_status_t integer type function. */
+    void Switch_turnOff(switch_t swSwitch);                         /*!< switch_status_t integer type function. */
 
     #ifdef __cplusplus
       }

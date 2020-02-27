@@ -49,7 +49,7 @@
     - HALru
     - ESP12
   */
-  #define NoMicrocontroller
+  #define ArduinoAVR
 
   //! Configuration: RTOS Auto Initialization
   /*!
@@ -57,7 +57,7 @@
       - __AUTO_INITIALIZATION_ENABLE__
       - __AUTO_INITIALIZATION_DISABLE__
   */
-  #define __AUTO_INITIALIZATION_ENABLE__
+  #define __AUTO_INITIALIZATION_DISABLE__
 
   //! Configuration: Task Manager
   /*!
@@ -81,13 +81,13 @@
     /*!
       It's amount of task that can be installed on task scheduler.
     */
-    #define __AMOUNT_OF_TASKS__ 8
+    #define __AMOUNT_OF_TASKS__ 3
 
     //! Configuration: Task Name Size
     /*!
       It is the number of characters that the task name can contain.
     */
-    #define __TASK_NAME_SIZE__ 7
+    #define __TASK_NAME_SIZE__ 5
 
     //! Configuration: Minimum Thread Priority
     /*!
