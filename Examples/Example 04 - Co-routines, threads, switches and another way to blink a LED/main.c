@@ -46,7 +46,7 @@
 #define GPIO_OUTPUT_HIGH 1
 #define GPIO_OUTPUT_LOW 0
 #define vSerialBegin(ui32BaudRate)
-#define vSendSerial(sString1)
+#define vSendSerial(sString)
 
 /*!
   tTask1 task declaration and implementation.
