@@ -8,6 +8,7 @@
   Permissions of this copyleft license are conditioned on making available
   complete source code of licensed works and modifications under the same
   license or the GNU GPLv3. Copyright and license notices must be preserved.
+  
   Contributors provide an express grant of patent rights. However, a larger
   work using the licensed work through interfaces provided by the licensed
   work may be distributed under different terms and without source code for
@@ -35,102 +36,104 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#include <UART.h>
+#include <stdint.h>
+#include <stdbool.h>
 #include <jOS.h>
+
+#define vSerialBegin(ui32BaudRate)
+#define vSendSerial(sString)
 
 /*!
   tTask1 task declaration and implementation.
 */
 task_t tTask1;
-uint8_t ui8Task1(void* vpArgs){
+void vTask1(void* vpArgs) THREAD{
   /*!
     Pointing out to smTaskFlag semaphore.
   */
-  static semaphore_t* smTaskFlag = (semaphore_t*) vpArgs;
+  static semaphore_t smTaskFlag = (semaphore_t) vpArgs;
 
   /*!
     Starting co-routine.
   */
-  CoRoutine {
+  thread_loop {
     /*!
       Waiting for "semaphore".
     */
-    vWaitFor(ui8TakeSemaphore(smTaskFlag) == TASK_HOLDER);
+    Task_waitFor(Semaphore_take(smTaskFlag) == SEMAPHORE_STATUS_TASK_HOLDER);
 
     /*!
       Executing the function when "semaphore open".
     */
-    printf("%s: Processing A\n", tpGetCurrentTask()->cpTaskName);
-    printf("%s: Processing B\n", tpGetCurrentTask()->cpTaskName);
-    printf("%s: Processing C\n", tpGetCurrentTask()->cpTaskName);
+    vSendSerial("Processing A");
+    vSendSerial("Processing B");
+    vSendSerial("Processing C");
 
     /*!
       Returning "semaphore".
     */
-    ui8ReturnSemaphore(smTaskFlag);
+    Semaphore_return(smTaskFlag);
 
     /*!
       Pausing the task.
     */
-    vTaskYield();
-
-  /*!
-    Co-routine finalization (Without finalization, your code will not work).
-  */
-  } EndCoRoutine;
-}
+    Task_yield();
+  }
+} END_THREAD
 
 /*!
   tTask2 task declaration and implementation (Very similar to tTask1).
 */
 task_t tTask2;
-uint8_t ui8Task2(void* vpArgs){
-  static semaphore_t* smTaskFlag = (semaphore_t*) vpArgs;
-  CoRoutine {
-    vWaitFor(ui8TakeSemaphore(smTaskFlag) == TASK_HOLDER);
-    printf("%s: Executing A\n", tpGetCurrentTask()->cpTaskName);
-    printf("%s: Executing B\n", tpGetCurrentTask()->cpTaskName);
-    printf("%s: Executing C\n", tpGetCurrentTask()->cpTaskName);
-    ui8ReturnSemaphore(smTaskFlag);
-    vTaskYield();
-  } EndCoRoutine;
-}
+void vTask2(void* vpArgs) THREAD{
+  static semaphore_t smTaskFlag = (semaphore_t) vpArgs;
+  thread_loop {
+    Task_waitFor(Semaphore_take(smTaskFlag) == SEMAPHORE_STATUS_TASK_HOLDER);
+    vSendSerial("Executing A");
+    vSendSerial("Executing B");
+    vSendSerial("Executing C");
+    Semaphore_return(smTaskFlag);
+    Task_yield();
+  };
+} END_THREAD
 
 int main(void){
   /*!
     Hardwares initialization.
   */
-  vUARTInit(9600);
-
-  /*!
-    Memory manager initialization.
-  */
-  if (ui8MemoryManagerInit() != MEMORY_MANAGER_INITIALIZED){
-    vSystemRestart();
-  }
+  vSerialBegin(9600);
 
   /*!
     tTaskFlag switch declaration.
   */
   semaphore_t smTaskFlag;
-  if (ui8CreateSemaphore(&smTaskFlag, BINNARY) != SEMAPHORE_INITIALIZED){
-    vSystemRestart();
-  }
+  newSemaphore(
+    smTaskFlag,                   // Semaphore handler. 
+    SEMAPHORE_TYPE_BINARY,        // Semaphore type.
+    5000                          // Watchdog timeout.
+  );
 
   /*!
     Tasks installations.
   */
-  ui8AddTask(&tTask1, &ui8Task1, "Task1", &smTaskFlag, 0, 100, ENABLED);
-  ui8AddTask(&tTask2, &ui8Task2, "Task2", &smTaskFlag, 0, 100, ENABLED);
+  newThread(tTask1, "Task1", &vTask1, smTaskFlag, 100, 1, TASK_STATUS_ENABLED);
+  newThread(tTask2, "Task2", &vTask2, smTaskFlag, 100, 1, TASK_STATUS_ENABLED);
 
-  /*!
-    Task manager initialization.
-  */
-  ui8TaskManagerInit();
-  while(1){
+  #if !(defined(__AUTO_INITIALIZATION_ENABLE__))
+
     /*!
-      Scheduling tasks.
+      Task manager initialization.
     */
-    vStartScheduler();
-  }
+    Scheduler_setMode(SCHEDULER_MODE_ROUND_ROBIN);
+    Scheduler_enable();
+    Semaphore_initWatchdog();
+    
+    while(1){
+      /*!
+        Scheduling tasks.
+      */
+      Scheduler_start();
+    }
+
+  #endif
 }
