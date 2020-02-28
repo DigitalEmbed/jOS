@@ -79,7 +79,7 @@
 /*!
   This macro pauses a coroutine block/thread in a void function.
 */
-#define yield()\
+#define changeContext()\
   yield();\
   Task_yield()
 
@@ -99,10 +99,10 @@ typedef struct{
   task_t (*find)(const char* cpTaskName);                                           /*!< task_t "method". */
   void (*setPeriod)(task_t tTask, uint16_t ui16Period);                             /*!< void "method". */
   void (*setPriority)(task_t tTask, uint8_t ui8Priority);                           /*!< void "method". */
-  void (*delayMS)(uint16_t ui16TimeMS);												/*!< void "method". */
-  void (*waitFor)(bool bCondition);													/*!< void "method". */
-  void (*waitUntil)(bool bCondition);												/*!< void "method". */
-  void (*yield)(void);																/*!< void "method". */
+  void (*delayMS)(uint16_t ui16TimeMS);												                      /*!< void "method". */
+  void (*waitFor)(bool bCondition);													                        /*!< void "method". */
+  void (*waitUntil)(bool bCondition);												                        /*!< void "method". */
+  void (*yield)(void);																                              /*!< void "method". */
 } task_manager_t;
 
 #if defined(__AVR)
