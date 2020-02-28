@@ -42,10 +42,46 @@
 #endif
 
 #include <jOS.h>
+#include <stdbool.h>
 
-#if defined(__AVR)
+#if defined (__AVR)
   #include <avr/pgmspace.h>
 #endif
+
+//! Macro: Coroutine/Thread Pauser
+/*!
+  This macro pauses a coroutine block/thread in a void function in a time period.
+  \param ui16TimeMS is a 16-bits unsigned integer. It's the time period that the function will be paused.
+*/
+#define delayMS(ui16TimeMS)\
+  delayMS(0);\
+  Task_delayMS(ui16TimeMS)
+
+//! Macro: Coroutine/Thread Pauser
+/*!
+  This macro pauses a coroutine block/thread in a void function until a condition isn't satisfied.
+  \param xCondition is the condition that will be verified.
+*/
+#define waitFor(xCondition)\
+  waitFor(false);\
+  Task_waitFor(xCondition)
+
+//! Macro: Coroutine/Thread Pauser
+/*!
+  This macro pauses a coroutine block/thread in a void function until a condition is satisfied.
+  \param xCondition is the condition that will be verified.
+*/
+#define waitUntil(xCondition)\
+  waitUntil(false);\
+  Task_waitUntil(xCondition)
+
+//! Macro: Coroutine/Thread Context Changer
+/*!
+  This macro pauses a coroutine block/thread in a void function.
+*/
+#define yield()\
+  yield();\
+  Task_yield()
 
 //! Type Definition: task_manager_t
 /*!
@@ -63,6 +99,10 @@ typedef struct{
   task_t (*find)(const char* cpTaskName);                                           /*!< task_t "method". */
   void (*setPeriod)(task_t tTask, uint16_t ui16Period);                             /*!< void "method". */
   void (*setPriority)(task_t tTask, uint8_t ui8Priority);                           /*!< void "method". */
+  void (*delayMS)(uint16_t ui16TimeMS);												/*!< void "method". */
+  void (*waitFor)(bool bCondition);													/*!< void "method". */
+  void (*waitUntil)(bool bCondition);												/*!< void "method". */
+  void (*yield)(void);																/*!< void "method". */
 } task_manager_t;
 
 #if defined(__AVR)
