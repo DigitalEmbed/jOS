@@ -60,7 +60,7 @@ void vTask1(void* vpArgs) THREAD{
     /*!
       Waiting for "semaphore".
     */
-    Task_waitFor(Semaphore.take(smTaskFlag) == SEMAPHORE_STATUS_TASK_HOLDER);
+    Task.waitFor(Semaphore.take(smTaskFlag) == SEMAPHORE_STATUS_TASK_HOLDER);
 
     /*!
       Executing the function when "semaphore open".
@@ -77,7 +77,7 @@ void vTask1(void* vpArgs) THREAD{
     /*!
       Pausing the task.
     */
-    Task_yield();
+    Task.yield();
   }
 } END_THREAD
 
@@ -88,12 +88,12 @@ task_t tTask2;
 void vTask2(void* vpArgs) THREAD{
   static semaphore_t smTaskFlag = (semaphore_t) vpArgs;
   thread_loop {
-    Task_waitFor(Semaphore.take(smTaskFlag) == SEMAPHORE_STATUS_TASK_HOLDER);
+    Task.waitFor(Semaphore.take(smTaskFlag) == SEMAPHORE_STATUS_TASK_HOLDER);
     vSendSerial("Executing A");
     vSendSerial("Executing B");
     vSendSerial("Executing C");
     Semaphore.giveBack(smTaskFlag);
-    Task_yield();
+    Task.yield();
   };
 } END_THREAD
 
