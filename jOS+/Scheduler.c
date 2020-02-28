@@ -13,7 +13,11 @@ static void __Scheduler_setRelative(void);
 /*!
   Scheduler object "constructor".
 */
-const scheduler_manager_t Scheduler PROGMEM = {
+#if defined(__AVR)
+  const scheduler_manager_t Scheduler PROGMEM = {
+#else
+  const scheduler_manager_t Scheduler = {
+#endif
   .setRoundRobinMode = &__Scheduler_setRoundRobin,
   .setRelativeMode = &__Scheduler_setRelative,
   .setAbsoluteMode = &__Scheduler_setAbsolute,

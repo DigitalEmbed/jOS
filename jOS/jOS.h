@@ -40,7 +40,7 @@
   extern "C" {
 #endif
 
-#define JOS_ACTIVED
+#define __JOS_ACTIVED__
 
 //! Standard C Libs
 /*!

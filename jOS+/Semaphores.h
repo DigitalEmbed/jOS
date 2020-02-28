@@ -1,4 +1,4 @@
-//! winTerface Version 1.0b
+//! jOS Version 3.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -6,6 +6,7 @@
   Permissions of this copyleft license are conditioned on making available
   complete source code of licensed works and modifications under the same
   license or the GNU GPLv3. Copyright and license notices must be preserved.
+  
   Contributors provide an express grant of patent rights. However, a larger
   work using the licensed work through interfaces provided by the licensed
   work may be distributed under different terms and without source code for
@@ -41,7 +42,10 @@
 #endif
 
 #include <jOS.h>
-#include <avr/pgmspace.h>
+
+#if defined (__AVR)
+  #include <avr/pgmspace.h>
+#endif
 
 //! Type Definition: semaphore_manager_t
 /*!
@@ -52,7 +56,11 @@ typedef struct {
   semaphore_status_t (*giveBack)(semaphore_t smObjectSemaphore);                /*!< uint8_t "method". */
 } semaphore_manager_t;
 
-extern const semaphore_manager_t Semaphore PROGMEM;                             /*!< Semaphore manager "object". */
+#if defined(__AVR)
+  extern const semaphore_manager_t Semaphore PROGMEM;                           /*!< Semaphore manager "object". */
+#else
+  extern const semaphore_manager_t Semaphore;                                   /*!< Semaphore manager "object". */
+#endif
 
 #ifdef __cplusplus
   }

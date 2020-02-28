@@ -42,7 +42,10 @@
 #endif
 
 #include <jOS.h>
-#include <avr/pgmspace.h>
+
+#if defined (__AVR)
+  #include <avr/pgmspace.h>
+#endif
 
 //! Type Definition: switch_manager_t
 /*!
@@ -54,7 +57,11 @@ typedef struct {
   switch_status_t (*getStatus)(switch_t swObjectSwitch);              /*!< switch_status_t "method". */
 } switch_manager_t;
 
-extern const switch_manager_t Switch PROGMEM;                         /*!< Switch manager "object". */
+#if defined(__AVR)
+  extern const switch_manager_t Switch PROGMEM;                       /*!< Switch manager "object". */
+#else
+  extern const switch_manager_t Switch;
+#endif
 
 #ifdef __cplusplus
   }

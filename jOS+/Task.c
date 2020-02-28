@@ -3,7 +3,12 @@
 /*!
   Task object "constructor".
 */
-const task_manager_t Task PROGMEM = {
+
+#if defined(__AVR)
+  const task_manager_t Task PROGMEM = {
+#else
+  const task_manager_t Task = {
+#endif
   .disable = &Task_disable,
   .enable = &Task_enable,
   .forceExecution = &Task_forceExecution,

@@ -1,4 +1,4 @@
-//! winTerface Version 1.0b
+//! jOS Version 3.0b
 /*!
   This code file was written by Jorge Henrique Moreira Santana and is under
   the GNU GPLv3 license. All legal rights are reserved.
@@ -6,6 +6,7 @@
   Permissions of this copyleft license are conditioned on making available
   complete source code of licensed works and modifications under the same
   license or the GNU GPLv3. Copyright and license notices must be preserved.
+  
   Contributors provide an express grant of patent rights. However, a larger
   work using the licensed work through interfaces provided by the licensed
   work may be distributed under different terms and without source code for
@@ -41,7 +42,10 @@
 #endif
 
 #include <jOS.h>
-#include <avr/pgmspace.h>
+
+#if defined (__AVR)
+  #include <avr/pgmspace.h>
+#endif
 
 typedef struct {
   void (*attachCallback)(void (*vfWatchdogCallback)(void*), void* vpWatchdogCallbackArguments);       /*!< void "method". */
@@ -66,7 +70,11 @@ typedef struct {
   watchdog_object_t Watchdog;                                                                         /*!< watchdog_scheduler_manager_t "object". */
 } scheduler_manager_t;
 
-extern const scheduler_manager_t Scheduler PROGMEM;                                                   /*!< Scheduler manager "object". */
+#if defined(__AVR)
+  extern const scheduler_manager_t Scheduler PROGMEM;                                                 /*!< Scheduler manager "object". */
+#else
+  extern const scheduler_manager_t Scheduler;                                                         /*!< Scheduler manager "object". */
+#endif
 
 #ifdef __cplusplus
   }

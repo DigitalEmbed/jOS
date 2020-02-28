@@ -42,7 +42,10 @@
 #endif
 
 #include <jOS.h>
-#include <avr/pgmspace.h>
+
+#if defined (__AVR)
+  #include <avr/pgmspace.h>
+#endif
 
 //! Type Definition: task_manager_t
 /*!
@@ -62,7 +65,11 @@ typedef struct{
   void (*setPriority)(task_t tTask, uint8_t ui8Priority);                           /*!< void "method". */
 } task_manager_t;
 
-extern const task_manager_t Task PROGMEM;                                           /*!< Task manager "object". */
+#if defined(__AVR)
+  extern const task_manager_t Task PROGMEM;                                         /*!< Task manager "object". */
+#else
+  extern const task_manager_t Task;                                                 /*!< Task manager "object". */
+#endif
 
 #ifdef __cplusplus
   }
