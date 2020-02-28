@@ -43,25 +43,16 @@
 #include <jOS.h>
 #include <avr/pgmspace.h>
 
-//! Macro: semaphore_t "object constructor"
-/*!
-  "Construct" a semaphore_t "object".
-  \return Returns the object.
-*/
-#define   NewSemaphore()   {0}
-
 //! Type Definition: semaphore_manager_t
 /*!
   This is a "class" of semaphore_manager_t type.
 */
 typedef struct {
-  uint8_t (*ui8Begin)(semaphore_t* smObjectSemaphore, uint8_t ui8SemaphoreType, uint16_t ui16ResetTime);            /*!< uint8_t "method". */
-  uint8_t (*ui8Take)(semaphore_t* smObjectSemaphore);                                                               /*!< uint8_t "method". */
-  uint8_t (*ui8Return)(semaphore_t* smObjectSemaphore);                                                             /*!< uint8_t "method". */
-  void (*vSetWatchdog)(void);                                                                                       /*!< void "method". */
+  semaphore_status_t (*take)(semaphore_t smObjectSemaphore);                    /*!< uint8_t "method". */
+  semaphore_status_t (*giveBack)(semaphore_t smObjectSemaphore);                /*!< uint8_t "method". */
 } semaphore_manager_t;
 
-extern const semaphore_manager_t Semaphore PROGMEM;                                                                 /*!< Semaphore manager "object". */
+extern const semaphore_manager_t Semaphore PROGMEM;                             /*!< Semaphore manager "object". */
 
 #ifdef __cplusplus
   }

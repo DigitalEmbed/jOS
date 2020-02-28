@@ -57,7 +57,7 @@
       - __AUTO_INITIALIZATION_ENABLE__
       - __AUTO_INITIALIZATION_DISABLE__
   */
-  #define __AUTO_INITIALIZATION_DISABLE__
+  #define __AUTO_INITIALIZATION_ENABLE__
 
   //! Configuration: Task Manager
   /*!
@@ -75,7 +75,7 @@
         - __TASK_DESTRUCTOR_ENABLE__
         - __TASK_DESTRUCTOR_DISABLE__
     */
-    #define __TASK_DESTRUCTOR_DISABLE__
+    #define __TASK_DESTRUCTOR_ENABLE__
 
     //! Configuration: Amount of Tasks
     /*!

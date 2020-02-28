@@ -43,19 +43,30 @@
 #include <jOS.h>
 #include <avr/pgmspace.h>
 
+typedef struct {
+  void (*attachCallback)(void (*vfWatchdogCallback)(void*), void* vpWatchdogCallbackArguments);       /*!< void "method". */
+  void (*detachCallback)(void);                                                                       /*!< void "method". */
+} watchdog_scheduler_manager_t;
+
+typedef struct {
+  watchdog_scheduler_manager_t Tasks;
+  watchdog_scheduler_manager_t Semaphores;
+} watchdog_object_t;
+
 //! Type Definition: scheduler_manager_t
 /*!
   This is a "class" of scheduler_manager_t type.
 */
 typedef struct {
-  void (*vSetRoundRobinMode)(void);                                   /*!< void "method". */
-  void (*vSetRelativeMode)(void);                                     /*!< void "method". */
-  void (*vSetAbsoluteMode)(void);                                     /*!< void "method". */
-  void (*vSetFullAbsoluteMode)(void);                                 /*!< void "method". */
-  void (*vStart)(void);                                               /*!< void "method". */
+  void (*setRoundRobinMode)(void);                                                                    /*!< void "method". */
+  void (*setRelativeMode)(void);                                                                      /*!< void "method". */
+  void (*setAbsoluteMode)(void);                                                                      /*!< void "method". */
+  void (*setFullAbsoluteMode)(void);                                                                  /*!< void "method". */
+  void (*start)(void);                                                                                /*!< void "method". */
+  watchdog_object_t Watchdog;                                                                         /*!< watchdog_scheduler_manager_t "object". */
 } scheduler_manager_t;
 
-extern const scheduler_manager_t Scheduler PROGMEM;                   /*!< Scheduler manager "object". */
+extern const scheduler_manager_t Scheduler PROGMEM;                                                   /*!< Scheduler manager "object". */
 
 #ifdef __cplusplus
   }

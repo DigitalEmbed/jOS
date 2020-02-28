@@ -79,7 +79,7 @@
     void Scheduler_setMode(scheduler_mode_t smSchedulerMode);                                                             /*!< void type function. */
     void Scheduler_enable(void);                                                                                          /*!< void type function. */
     void Scheduler_start(void);                                                                                           /*!< void type function. */
-    void Scheduler_setModeAllTasks(void);                                                                                 /*!< void type function. */
+    void Scheduler_enableAllTasks(void);                                                                                  /*!< void type function. */
     void Scheduler_disableAllTasks(void);                                                                                 /*!< void type function. */
     void Scheduler_attachWatchdogCallback(void (*vfWatchdogCallback)(void*), void* vpWatchdogCallbackArguments);          /*!< void type function. */
     void Scheduler_detachWatchdogCallback(void);                                                                          /*!< void type function. */
