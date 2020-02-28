@@ -1,4 +1,4 @@
-//! Example 05 - Threads with binnary semaphore
+//! Example 03 - Threads with binnary semaphore
 /*!
   This simply example demonstrates how to share a variable between tasks.
 
@@ -122,7 +122,7 @@ int main(void){
   #if !(defined(__AUTO_INITIALIZATION_ENABLE__))
 
     /*!
-      Task manager initialization.
+      Scheduler initialization.
     */
     Scheduler.setRoundRobinMode();
     Scheduler.start();
