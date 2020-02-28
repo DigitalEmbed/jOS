@@ -65,7 +65,7 @@ void vTask1(void* vpArgs){
     /*!
       Waiting for "semaphore".
     */
-    Task_waitFor(Switch.getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_OFF);
+    Task.waitFor(Switch.getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_OFF);
 
     /*!
       Executing the function when "semaphore" open.
@@ -80,7 +80,7 @@ void vTask1(void* vpArgs){
     /*!
       Waiting for "semaphore".
     */
-    Task_waitFor(Switch.getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_OFF);
+    Task.waitFor(Switch.getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_OFF);
 
     /*!
       Executing the function when "semaphore" open.
@@ -96,7 +96,7 @@ void vTask1(void* vpArgs){
     /*!
       Waiting for "semaphore".
     */
-    Task_waitFor(Switch.getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_OFF);
+    Task.waitFor(Switch.getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_OFF);
 
     /*!
       Executing the function when "semaphore" open.
@@ -121,13 +121,13 @@ task_t tTask2;
 void vTask2(void* vpArgs) THREAD{
   static switch_t* sTaskFlag = (switch_t*) vpArgs;
   thread_loop {
-    Task_waitFor(Switch.getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_ON);
+    Task.waitFor(Switch.getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_ON);
     vSendSerial("Executing A");
     Switch.turnOff(*sTaskFlag);
-    Task_waitFor(Switch.getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_ON);
+    Task.waitFor(Switch.getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_ON);
     vSendSerial("Executing B");
     Switch.turnOff(*sTaskFlag);
-    Task_waitFor(Switch.getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_ON);
+    Task.waitFor(Switch.getStatus(*sTaskFlag) == SWITCH_STATUS_TURNED_ON);
     vSendSerial("Executing C");
     Switch.turnOff(*sTaskFlag);
   }
@@ -155,7 +155,7 @@ void vBlink(void* vpArgs){
     /*!
       Task pausing.
     */
-    Task_delayMS(1000);
+    Task.delayMS(1000);
     
     /*!
       Turning off the LED.
@@ -165,7 +165,7 @@ void vBlink(void* vpArgs){
     /*!
       Task pausing.
     */
-    Task_delayMS(1000);
+    Task.delayMS(1000);
   } end_coroutine;
 }
 
