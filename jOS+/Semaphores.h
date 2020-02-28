@@ -43,7 +43,7 @@
 
 #include <jOS.h>
 
-#if defined (__AVR)
+#if defined(__AVR)
   #include <avr/pgmspace.h>
 #endif
 
