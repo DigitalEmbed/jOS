@@ -3,7 +3,7 @@
 /*!
   Semaphore object "constructor".
 */
-#if defined(__AVR)
+#if defined(__AVR__)
   const semaphore_manager_t Semaphore PROGMEM = {
 #else
   const semaphore_manager_t Semaphore = {
