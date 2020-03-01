@@ -44,7 +44,7 @@
 #include <jOS.h>
 #include <stdbool.h>
 
-#if defined (__AVR)
+#if defined (__AVR__)
   #include <avr/pgmspace.h>
 #endif
 
@@ -105,7 +105,7 @@ typedef struct{
   void (*yield)(void);																                              /*!< void "method". */
 } task_manager_t;
 
-#if defined(__AVR)
+#if defined(__AVR__)
   extern const task_manager_t Task PROGMEM;                                         /*!< Task manager "object". */
 #else
   extern const task_manager_t Task;                                                 /*!< Task manager "object". */
