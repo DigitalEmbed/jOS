@@ -43,7 +43,7 @@
 
 #include <jOS.h>
 
-#if defined(__AVR)
+#if defined(__AVR__)
   #include <avr/pgmspace.h>
 #endif
 
@@ -70,7 +70,7 @@ typedef struct {
   watchdog_object_t Watchdog;                                                                         /*!< watchdog_scheduler_manager_t "object". */
 } scheduler_manager_t;
 
-#if defined(__AVR)
+#if defined(__AVR__)
   extern const scheduler_manager_t Scheduler PROGMEM;                                                 /*!< Scheduler manager "object". */
 #else
   extern const scheduler_manager_t Scheduler;                                                         /*!< Scheduler manager "object". */
