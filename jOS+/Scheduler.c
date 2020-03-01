@@ -13,7 +13,7 @@ static void __Scheduler_setRelative(void);
 /*!
   Scheduler object "constructor".
 */
-#if defined(__AVR)
+#if defined(__AVR__)
   const scheduler_manager_t Scheduler PROGMEM = {
 #else
   const scheduler_manager_t Scheduler = {
