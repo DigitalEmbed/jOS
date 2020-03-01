@@ -3,7 +3,7 @@
 /*!
   Switch object "constructor".
 */
-#if defined(__AVR)
+#if defined(__AVR__)
   const switch_manager_t Switch PROGMEM = {
 #else
   const switch_manager_t Switch = {
