@@ -43,7 +43,7 @@
 
 #include <jOS.h>
 
-#if defined(__AVR)
+#if defined(__AVR__)
   #include <avr/pgmspace.h>
 #endif
 
@@ -56,7 +56,7 @@ typedef struct {
   semaphore_status_t (*giveBack)(semaphore_t smObjectSemaphore);                /*!< uint8_t "method". */
 } semaphore_manager_t;
 
-#if defined(__AVR)
+#if defined(__AVR__)
   extern const semaphore_manager_t Semaphore PROGMEM;                           /*!< Semaphore manager "object". */
 #else
   extern const semaphore_manager_t Semaphore;                                   /*!< Semaphore manager "object". */
