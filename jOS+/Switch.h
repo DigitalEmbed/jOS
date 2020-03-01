@@ -43,7 +43,7 @@
 
 #include <jOS.h>
 
-#if defined(__AVR)
+#if defined(__AVR__)
   #include <avr/pgmspace.h>
 #endif
 
@@ -57,7 +57,7 @@ typedef struct {
   switch_status_t (*getStatus)(switch_t swObjectSwitch);              /*!< switch_status_t "method". */
 } switch_manager_t;
 
-#if defined(__AVR)
+#if defined(__AVR__)
   extern const switch_manager_t Switch PROGMEM;                       /*!< Switch manager "object". */
 #else
   extern const switch_manager_t Switch;
