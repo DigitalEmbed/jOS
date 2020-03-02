@@ -10,7 +10,7 @@
   /*!
     This bit vector is for managing switches positions in the switch manager.
   */
-  newBitVector(bvSwitches, __AMOUNT_OF_SEMAPHORES__);
+  newBitVector(bvSwitches, __AMOUNT_OF_SWITCHES__);
 
   //! Function: Switch Initializer
   /*!
@@ -20,7 +20,7 @@
   */
   switch_status_t (newSwitch)(switch_t* swSwitch){
     static uint8_t ui8SwitchCounter = 0;
-    if (ui8SwitchCounter >= __AMOUNT_OF_SEMAPHORES__){
+    if (ui8SwitchCounter >= __AMOUNT_OF_SWITCHES__){
       return SWITCH_STATUS_ERROR_NOT_INITIALIZED;
     }
     *swSwitch = ui8SwitchCounter;

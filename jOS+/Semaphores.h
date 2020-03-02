@@ -34,36 +34,40 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Semaphores_Class_h
-#define Semaphores_Class_h
+#ifndef __SEMAPHORES_CLASS_H__
+  #define __SEMAPHORES_CLASS_H__
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
+  #include <jOS.h>
 
-#include <jOS.h>
+  #if defined(__SEMAPHORES_MANAGER_ENABLE__) && defined(__AMOUNT_OF_SEMAPHORES__) &&\
+  defined(__MINIMUM_SEMAPHORE_TIMEOUT_MS__) && (__AMOUNT_OF_SEMAPHORES__ > 0) && (__MINIMUM_SEMAPHORE_TIMEOUT_MS__ > 0)
 
-#if defined(__AVR__)
-  #include <avr/pgmspace.h>
-#endif
+    #ifdef __cplusplus
+      extern "C" {
+    #endif
 
-//! Type Definition: semaphore_manager_t
-/*!
-  This is a "class" of semaphore_manager_t type.
-*/
-typedef struct {
-  semaphore_status_t (*take)(semaphore_t smObjectSemaphore);                    /*!< uint8_t "method". */
-  semaphore_status_t (*giveBack)(semaphore_t smObjectSemaphore);                /*!< uint8_t "method". */
-} semaphore_manager_t;
+    #if defined(__AVR__)
+      #include <avr/pgmspace.h>
+    #endif
 
-#if defined(__AVR__)
-  extern const semaphore_manager_t Semaphore PROGMEM;                           /*!< Semaphore manager "object". */
-#else
-  extern const semaphore_manager_t Semaphore;                                   /*!< Semaphore manager "object". */
-#endif
+    //! Type Definition: semaphore_manager_t
+    /*!
+      This is a "class" of semaphore_manager_t type.
+    */
+    typedef struct {
+      semaphore_status_t (*take)(semaphore_t smObjectSemaphore);                    /*!< uint8_t "method". */
+      semaphore_status_t (*giveBack)(semaphore_t smObjectSemaphore);                /*!< uint8_t "method". */
+    } semaphore_manager_t;
 
-#ifdef __cplusplus
-  }
-#endif
+    #if defined(__AVR__)
+      extern const semaphore_manager_t Semaphore PROGMEM;                           /*!< Semaphore manager "object". */
+    #else
+      extern const semaphore_manager_t Semaphore;                                   /*!< Semaphore manager "object". */
+    #endif
 
+    #ifdef __cplusplus
+      }
+    #endif
+
+  #endif
 #endif

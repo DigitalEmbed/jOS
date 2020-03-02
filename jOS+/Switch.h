@@ -34,37 +34,40 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Switch_Class_h
-#define Switch_Class_h
+#ifndef __SWITCH_CLASS_H__
+  #define __SWITCH_CLASS_H__
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
+  #ifdef __cplusplus
+    extern "C" {
+  #endif
 
-#include <jOS.h>
+  #include <jOS.h>
 
-#if defined(__AVR__)
-  #include <avr/pgmspace.h>
-#endif
+  #if defined(__SWITCHES_MANAGER_ENABLE__) && defined(__AMOUNT_OF_SWITCHES__) && (__AMOUNT_OF_SWITCHES__ > 0)
 
-//! Type Definition: switch_manager_t
-/*!
-  This is a "class" of switch_manager_t type.
-*/
-typedef struct {
-  void (*turnOn)(switch_t swObjectSwitch);                            /*!< void "method". */
-  void (*turnOff)(switch_t swObjectSwitch);                           /*!< void "method". */
-  switch_status_t (*getStatus)(switch_t swObjectSwitch);              /*!< switch_status_t "method". */
-} switch_manager_t;
+    #if defined(__AVR__)
+      #include <avr/pgmspace.h>
+    #endif
 
-#if defined(__AVR__)
-  extern const switch_manager_t Switch PROGMEM;                       /*!< Switch manager "object". */
-#else
-  extern const switch_manager_t Switch;
-#endif
+    //! Type Definition: switch_manager_t
+    /*!
+      This is a "class" of switch_manager_t type.
+    */
+    typedef struct {
+      void (*turnOn)(switch_t swObjectSwitch);                            /*!< void "method". */
+      void (*turnOff)(switch_t swObjectSwitch);                           /*!< void "method". */
+      switch_status_t (*getStatus)(switch_t swObjectSwitch);              /*!< switch_status_t "method". */
+    } switch_manager_t;
 
-#ifdef __cplusplus
-  }
-#endif
+    #if defined(__AVR__)
+      extern const switch_manager_t Switch PROGMEM;                       /*!< Switch manager "object". */
+    #else
+      extern const switch_manager_t Switch;
+    #endif
 
+    #ifdef __cplusplus
+      }
+    #endif
+
+  #endif
 #endif

@@ -34,113 +34,123 @@
 */
 
 #ifndef __COROUTINES_H__
-#define __COROUTINES_H__
+  #define __COROUTINES_H__
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
+  #include "./Configs.h"
 
-  #include "./Task.h"
-  #include "./Scheduler.h"
+  #if defined(__TASK_SCHEDULER_ENABLE__) &&\
+  defined(__AMOUNT_OF_TASKS__) && (__AMOUNT_OF_TASKS__ > 0) &&\
+  defined(__TASK_NAME_SIZE__) && (__TASK_NAME_SIZE__ > 0) &&\
+  defined(__MINIMUM_THREAD_PRIORITY__) && (__MINIMUM_THREAD_PRIORITY__ > 0) &&\
+  defined(__MINIMUM_TASK_TIMEOUT_MS__) && (__MINIMUM_TASK_TIMEOUT_MS__ > 0) &&\
+  defined(__SCHEDULER_DEFAULT_MODE__) && (__SCHEDULER_DEFAULT_MODE__ >= SCHEDULER_MODE_ROUND_ROBIN) && (__SCHEDULER_DEFAULT_MODE__ <= SCHEDULER_MODE_FULL_PRIORITY)
 
-  //! Macro: Coroutine Block Initializer
-  /*!
-    This macro initializes coroutine block in your void function.
-  */
-  #define coroutine\
-    static uint8_t __ui8TaskYield = 1;\
-    static uint16_t __ui16TaskPeriodBackup = 0;\
-    __ui16TaskPeriodBackup = 0;\
-    if (__ui8TaskYield != 1){\
-      System_restart();\
-    }\
-    __ui8TaskYield = 0;\
-    switch(__tCurrentTask->ui16Line){\
-      case 0:
+    #ifdef __cplusplus
+      extern "C" {
+    #endif
 
-  //! Macro: Coroutine Block Finalizer
-  /*!
-    This macro finalizes a coroutine block.
-  */
-  #define end_coroutine\
-    }\
-    __ui8TaskYield = 1;\
-    __tCurrentTask->ui16Line = __tCurrentTask->ui16StartLine;\
-    if (__ui16TaskPeriodBackup != 0){\
-      __tCurrentTask->ui16TimeCounter = __tCurrentTask->ui16Period;\
-    }\
+    #include "./Task.h"
+    #include "./Scheduler.h"
 
-  //! Macro: Coroutine/Thread Context Changer
-  /*!
-    This macro pauses a coroutine block/thread in a void function.
-  */
-  #define Task_yield()\
-    __tCurrentTask->ui16Line = __LINE__ ; __ui8TaskYield = 1 ; return ; case __LINE__: __ui8TaskYield = 0;
+    //! Macro: Coroutine Block Initializer
+    /*!
+      This macro initializes coroutine block in your void function.
+    */
+    #define coroutine\
+      static uint8_t __ui8TaskYield = 1;\
+      static uint16_t __ui16TaskPeriodBackup = 0;\
+      __ui16TaskPeriodBackup = 0;\
+      if (__ui8TaskYield != 1){\
+        System_restart();\
+      }\
+      __ui8TaskYield = 0;\
+      switch(__tCurrentTask->ui16Line){\
+        case 0:
 
-  //! Macro: Coroutine/Thread Pauser
-  /*!
-    This macro pauses a coroutine block/thread in a void function until a condition is satisfied.
-    \param xCondition is the condition that will be verified.
-  */
-  #define Task_waitUntil(xCondition)\
-    __tCurrentTask->ui16Line = __LINE__ ; case __LINE__: if ((xCondition)) {__ui8TaskYield = 1 ; return ;} __ui8TaskYield = 0;
+    //! Macro: Coroutine Block Finalizer
+    /*!
+      This macro finalizes a coroutine block.
+    */
+    #define end_coroutine\
+      }\
+      __ui8TaskYield = 1;\
+      __tCurrentTask->ui16Line = __tCurrentTask->ui16StartLine;\
+      if (__ui16TaskPeriodBackup != 0){\
+        __tCurrentTask->ui16TimeCounter = __tCurrentTask->ui16Period;\
+      }\
 
-  //! Macro: Coroutine/Thread Pauser
-  /*!
-    This macro pauses a coroutine block/thread in a void function until a condition isn't satisfied.
-    \param xCondition is the condition that will be verified.
-  */
-  #define Task_waitFor(xCondition)\
-    __tCurrentTask->ui16Line = __LINE__ ; case __LINE__: if (!(xCondition)) {__ui8TaskYield = 1 ; return ;} __ui8TaskYield = 0;
+    //! Macro: Coroutine/Thread Context Changer
+    /*!
+      This macro pauses a coroutine block/thread in a void function.
+    */
+    #define Task_yield()\
+      __tCurrentTask->ui16Line = __LINE__ ; __ui8TaskYield = 1 ; return ; case __LINE__: __ui8TaskYield = 0;
 
-  //! Macro: Coroutine/Thread Pauser
-  /*!
-    This macro pauses a coroutine block/thread in a void function in a time period.
-    \param ui16TimeMS is a 16-bits unsigned integer. It's the time period that the function will be paused.
-  */
-  #define Task_delayMS(ui16TimeMS)\
-    __ui16TaskPeriodBackup = __tCurrentTask->ui16Period ;\
-    Task_setPeriod(NULL, ((ui16TimeMS) < __ui8TaskTickMS ? __ui8TaskTickMS : (ui16TimeMS - __ui8TaskTickMS)));\
-    __tCurrentTask->ui16Line = __LINE__ ; __ui8TaskYield = 1 ; return ; case __LINE__:\
-    Task_setPeriod(NULL, __ui16TaskPeriodBackup);\
-    __ui8TaskYield = 0;
-  
-  //! Macro: Once Block Initializer
-  /*!
-    This macro initialize a block that will be runned once time.
-  */
-  #define once\
-    static uint8_t __ui8RunOnce = 0;\
-    if (__ui8RunOnce == 0)
+    //! Macro: Coroutine/Thread Pauser
+    /*!
+      This macro pauses a coroutine block/thread in a void function until a condition is satisfied.
+      \param xCondition is the condition that will be verified.
+    */
+    #define Task_waitUntil(xCondition)\
+      __tCurrentTask->ui16Line = __LINE__ ; case __LINE__: if ((xCondition)) {__ui8TaskYield = 1 ; return ;} __ui8TaskYield = 0;
 
-  //! Macro: Once Block Finalizer
-  /*!
-    This macro finalizes a once block.
-  */
-  #define end_once\
-    __ui8RunOnce = 1;
-  
-  //! Macro: Thread Modifier
-  /*!
-    This macro simulates a function modifier. Basically, this modifier initializer a corountine blocks in function start.
-  */
-  #define THREAD\
-    {\
-      coroutine
+    //! Macro: Coroutine/Thread Pauser
+    /*!
+      This macro pauses a coroutine block/thread in a void function until a condition isn't satisfied.
+      \param xCondition is the condition that will be verified.
+    */
+    #define Task_waitFor(xCondition)\
+      __tCurrentTask->ui16Line = __LINE__ ; case __LINE__: if (!(xCondition)) {__ui8TaskYield = 1 ; return ;} __ui8TaskYield = 0;
 
-  #define thread_loop\
-    __tCurrentTask->ui16StartLine = __LINE__; case __LINE__:
+    //! Macro: Coroutine/Thread Pauser
+    /*!
+      This macro pauses a coroutine block/thread in a void function in a time period.
+      \param ui16TimeMS is a 16-bits unsigned integer. It's the time period that the function will be paused.
+    */
+    #define Task_delayMS(ui16TimeMS)\
+      __ui16TaskPeriodBackup = __tCurrentTask->ui16Period ;\
+      Task_setPeriod(NULL, ((ui16TimeMS) < __ui8TaskTickMS ? __ui8TaskTickMS : (ui16TimeMS - __ui8TaskTickMS)));\
+      __tCurrentTask->ui16Line = __LINE__ ; __ui8TaskYield = 1 ; return ; case __LINE__:\
+      Task_setPeriod(NULL, __ui16TaskPeriodBackup);\
+      __ui8TaskYield = 0;
+    
+    //! Macro: Once Block Initializer
+    /*!
+      This macro initialize a block that will be runned once time.
+    */
+    #define once\
+      static uint8_t __ui8RunOnce = 0;\
+      if (__ui8RunOnce == 0)
 
-  //! Macro: Thread Modifier
-  /*!
-    This macro finalizes a THREAD block.
-  */
-  #define END_THREAD\
-      end_coroutine;\
-    }
+    //! Macro: Once Block Finalizer
+    /*!
+      This macro finalizes a once block.
+    */
+    #define end_once\
+      __ui8RunOnce = 1;
+    
+    //! Macro: Thread Modifier
+    /*!
+      This macro simulates a function modifier. Basically, this modifier initializer a corountine blocks in function start.
+    */
+    #define THREAD\
+      {\
+        coroutine
 
-#ifdef __cplusplus
-  }
-#endif
+    #define thread_loop\
+      __tCurrentTask->ui16StartLine = __LINE__; case __LINE__:
 
+    //! Macro: Thread Modifier
+    /*!
+      This macro finalizes a THREAD block.
+    */
+    #define END_THREAD\
+        end_coroutine;\
+      }
+
+    #ifdef __cplusplus
+      }
+    #endif
+
+  #endif
 #endif

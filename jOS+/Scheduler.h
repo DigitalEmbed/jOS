@@ -34,50 +34,63 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef Scheduler_Class_H
-#define Scheduler_Class_H
+#ifndef __SCHEDULER_CLASS_H__
+  #define __SCHEDULER_CLASS_H__
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
+  #include <jOS.h>
 
-#include <jOS.h>
+  #if defined(__TASK_SCHEDULER_ENABLE__) &&\
+  defined(__AMOUNT_OF_TASKS__) && (__AMOUNT_OF_TASKS__ > 0) &&\
+  defined(__TASK_NAME_SIZE__) && (__TASK_NAME_SIZE__ > 0) &&\
+  defined(__MINIMUM_THREAD_PRIORITY__) && (__MINIMUM_THREAD_PRIORITY__ > 0) &&\
+  defined(__MINIMUM_TASK_TIMEOUT_MS__) && (__MINIMUM_TASK_TIMEOUT_MS__ > 0) &&\
+  defined(__SCHEDULER_DEFAULT_MODE__) && (__SCHEDULER_DEFAULT_MODE__ >= SCHEDULER_MODE_ROUND_ROBIN) && (__SCHEDULER_DEFAULT_MODE__ <= SCHEDULER_MODE_FULL_PRIORITY)
 
-#if defined(__AVR__)
-  #include <avr/pgmspace.h>
-#endif
+    #ifdef __cplusplus
+      extern "C" {
+    #endif
 
-typedef struct {
-  void (*attachCallback)(void (*vfWatchdogCallback)(void*), void* vpWatchdogCallbackArguments);       /*!< void "method". */
-  void (*detachCallback)(void);                                                                       /*!< void "method". */
-} watchdog_scheduler_manager_t;
+    #if defined(__AVR__)
+      #include <avr/pgmspace.h>
+    #endif
 
-typedef struct {
-  watchdog_scheduler_manager_t Tasks;
-  watchdog_scheduler_manager_t Semaphores;
-} watchdog_object_t;
+    typedef struct {
+      void (*attachCallback)(void (*vfWatchdogCallback)(void*), void* vpWatchdogCallbackArguments);       /*!< void "method". */
+      void (*detachCallback)(void);                                                                       /*!< void "method". */
+    } watchdog_scheduler_manager_t;
 
-//! Type Definition: scheduler_manager_t
-/*!
-  This is a "class" of scheduler_manager_t type.
-*/
-typedef struct {
-  void (*setRoundRobinMode)(void);                                                                    /*!< void "method". */
-  void (*setRelativeMode)(void);                                                                      /*!< void "method". */
-  void (*setAbsoluteMode)(void);                                                                      /*!< void "method". */
-  void (*setFullAbsoluteMode)(void);                                                                  /*!< void "method". */
-  void (*start)(void);                                                                                /*!< void "method". */
-  watchdog_object_t Watchdog;                                                                         /*!< watchdog_scheduler_manager_t "object". */
-} scheduler_manager_t;
+    typedef struct {
+      watchdog_scheduler_manager_t Tasks;
 
-#if defined(__AVR__)
-  extern const scheduler_manager_t Scheduler PROGMEM;                                                 /*!< Scheduler manager "object". */
-#else
-  extern const scheduler_manager_t Scheduler;                                                         /*!< Scheduler manager "object". */
-#endif
+      #if defined(__SEMAPHORES_MANAGER_ENABLE__) && defined(__AMOUNT_OF_SEMAPHORES__) &&\
+      defined(__MINIMUM_SEMAPHORE_TIMEOUT_MS__) && (__AMOUNT_OF_SEMAPHORES__ > 0) && (__MINIMUM_SEMAPHORE_TIMEOUT_MS__ > 0)
+        watchdog_scheduler_manager_t Semaphores;
+      #endif
 
-#ifdef __cplusplus
-  }
-#endif
+    } watchdog_object_t;
 
+    //! Type Definition: scheduler_manager_t
+    /*!
+      This is a "class" of scheduler_manager_t type.
+    */
+    typedef struct {
+      void (*setRoundRobinMode)(void);                                                                    /*!< void "method". */
+      void (*setRelativeMode)(void);                                                                      /*!< void "method". */
+      void (*setAbsoluteMode)(void);                                                                      /*!< void "method". */
+      void (*setFullAbsoluteMode)(void);                                                                  /*!< void "method". */
+      void (*start)(void);                                                                                /*!< void "method". */
+      watchdog_object_t Watchdog;                                                                         /*!< watchdog_scheduler_manager_t "object". */
+    } scheduler_manager_t;
+
+    #if defined(__AVR__)
+      extern const scheduler_manager_t Scheduler PROGMEM;                                                 /*!< Scheduler manager "object". */
+    #else
+      extern const scheduler_manager_t Scheduler;                                                         /*!< Scheduler manager "object". */
+    #endif
+
+    #ifdef __cplusplus
+      }
+    #endif
+
+  #endif
 #endif

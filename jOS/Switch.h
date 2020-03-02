@@ -51,7 +51,7 @@
     /*!
       This typedef is for facilitate the use of this library.
     */
-    typedef enum{
+    typedef enum {
       SWITCH_STATUS_ERROR_NOT_INITIALIZED = 0,
       SWITCH_STATUS_INITIALIZED,
       SWITCH_STATUS_TURNED_OFF,
