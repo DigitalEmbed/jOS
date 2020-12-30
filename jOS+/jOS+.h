@@ -6,6 +6,7 @@
   Permissions of this copy left license are conditioned on making available
   complete source code of licensed works and modifications under the same
   license or the GNU GPLv3. Copyright and license notices must be preserved.
+  
   Contributors provide an express grant of patent rights. However, a larger
   work using the licensed work through interfaces provided by the licensed
   work may be distributed under different terms and without source code for
@@ -33,28 +34,28 @@
   to jorge_henrique_123@hotmail.com to talk.
 */
 
-#ifndef jOS_Classes_H
-#define jOS_Classes_H
+#ifndef __JOS_CLASSES_H__
+  #define __JOS_CLASSES_H__
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
+  #ifdef __cplusplus
+    extern "C" {
+  #endif
 
-/*!
-  RTOS Library
-*/
-#include <jOS.h>
+  /*!
+    RTOS Library
+  */
+  #include <jOS.h>
 
-/*!
-  Interface Libraries
-*/
-#include "./Task.h"
-#include "./Scheduler.h"
-#include "./Switch.h"
-#include "./Semaphores.h"
+  /*!
+    Interface Libraries
+  */
+  #include "./Task.h"
+  #include "./Scheduler.h"
+  #include "./Switch.h"
+  #include "./Semaphores.h"
 
-#ifdef __cplusplus
-  }
-#endif
+  #ifdef __cplusplus
+    }
+  #endif
 
 #endif
